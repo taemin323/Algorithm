@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 public class Main {
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		
 		int N = Integer.parseInt(st.nextToken());//학생 수
@@ -44,8 +45,9 @@ public class Main {
 			st = new StringTokenizer(br.readLine(), " ");
 			int S = Integer.parseInt(st.nextToken());
 			int E = Integer.parseInt(st.nextToken());
-			System.out.println(prefixSum[E] - prefixSum[S-1]);
+			sb.append(prefixSum[E] - prefixSum[S-1]).append("\n");
 		}
+		System.out.println(sb.toString());
 		
 	}//end of main
 }//end of class
