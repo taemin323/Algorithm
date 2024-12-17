@@ -9,10 +9,11 @@ public class Main {
 	private static int[] arr;
 	private static boolean[] visited;
 	private static int[] selected;
+	private static StringBuilder sb;
 
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
+		sb = new StringBuilder();
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		
 		N = Integer.parseInt(st.nextToken());
@@ -29,14 +30,15 @@ public class Main {
 		}
 		Arrays.sort(arr);
 		perm(0);
+		System.out.println(sb.toString());
 	}
 
 	private static void perm(int idx) {
 		if(idx == M) {
 			for (int i = 0; i < M; i++) {
-				System.out.print(selected[i] + " ");
+				sb.append(selected[i]).append(" ");
 			}
-			System.out.println();
+			sb.append("\n");
 			return;
 		}
 		
