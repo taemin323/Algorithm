@@ -10,37 +10,40 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int[] lost, int[] reserve) {
-        int[] students = new int[n+2];
+        int[] students = new int[n+1];
         
-        for (int i = 0; i < lost.length; i++) {
-            students[lost[i]] = -1;
-        }
+        Set<Integer> lostSet = new HashSet<>();
+        Set<Integer> reserveSet = new HashSet<>();
         
-        for (int i = 0; i < reserve.length; i++) {
-            if(students[reserve[i]] == -1) {
-                students[reserve[i]] = 0;
+        for (int l : lost) lostSet.add(l);
+        for (int r : reserve) {
+            if (lostSet.contains(r)) {
+                lostSet.remove(r); // 본인이 입음
             } else {
-                students[reserve[i]] = 1;
+                reserveSet.add(r); // 빌려줄 수 있는 사람 저장.
             }
         }
-
-        for (int i = 1; i < students.length; i++) {
-            if(students[i] == 1 && students[i-1] == -1) {
-                students[i] = 0;
-                students[i-1] = 0;
-            } else if (students[i] == 1 && students[i+1] == -1) {
-                students[i] = 0;
-                students[i+1] = 0;
+        
+        for (int l : lostSet) students[l]--;
+        for (int r : reserveSet) students[r]++;
+        
+        for (int i = 1; i <= n; i++) {
+            if (students[i] == -1) {
+                if (i > 1 && students[i-1] == 1) {
+                    students[i]++;
+                    students[i-1]--;
+                } else if (i < n && students[i+1] == 1) {
+                    students[i]++;
+                    students[i+1]--;
+                }
             }
         }
         
         int cnt = 0;
-        for (int i = 1; i < students.length-1; i++) {
-            if(students[i] >= 0) {
-                cnt++;
-            }
-            
+        for (int i = 1; i <= n; i++) {
+            if(students[i] >= 0) cnt ++;
         }
+        
         return cnt;
     }
 }
