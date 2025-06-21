@@ -6,29 +6,35 @@ public class Main {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		
 		String str = br.readLine();
+		int N = str.length();
 		
-		int aCnt = 0; //a의 총 개수 = a가 연속으로 나올 수 있는 길이.
 		
+		// a의 개수 = 윈도우 길이 K
+		int K = 0;
 		for (int i = 0; i < str.length(); i++) {
-			if (str.charAt(i) == 'a') aCnt++;
-		}
-		// a가 가장 많이 포함되어 있는 구간(aCnt만큼의 길이) 찾아서 그 구간에서 b의 개수가 결국 교환의 횟수.
-		// 대신 [0]과 [마지막 인덱스]가 둘 다 0인 문자열은 이어지는 걸 생각해야함. 문자열이 원형이기 때문에.
-		
-		int min = Integer.MAX_VALUE;
-		
-		for (int i = 0; i < str.length(); i++) {
-			int bCnt = 0;
-			int start = i;
-			
-			for (int j = start; j < aCnt + start; j++) {
-				if (str.charAt(j % str.length()) == 'b') {
-					bCnt++;
-				}
-			}
-			min = Math.min(bCnt, min);
+			if (str.charAt(i) == 'a') K++;
 		}
 		
-		System.out.println(min);
+		// 예외: 모두 a 또는 b
+		if (K == 0 || K == N) {
+			System.out.println(0);
+			return;
+		}
+		
+		// 원형 처리를 위해 문자열 두 번 이어붙이기
+		String S = str + str; // 길이는 2N
+		
+		// 누적합 배열
+		int[] prefix = new int[2*N+1];
+		for (int i = 0; i < 2 * N; i++) {
+			prefix[i + 1] = prefix[i] + (S.charAt(i) == 'b' ? 1 : 0);
+		}
+		
+		int ans = Integer.MAX_VALUE;
+		for (int i = 0; i < N; i++) {
+			int bCnt = prefix[i + K] - prefix[i];
+			ans = Math.min(ans, bCnt);
+		}
+		System.out.println(ans);
 	}
 }
