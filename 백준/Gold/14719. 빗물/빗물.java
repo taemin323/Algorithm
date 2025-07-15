@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -17,25 +16,29 @@ public class Main {
 			blocks[i] = Integer.parseInt(st.nextToken());
 		}// 입력 완료
 		
-		int cnt = 0;
+		//왼쪽 최대 높이
+		int[] leftMax = new int[W];
+		leftMax[0] = blocks[0];
+		for (int i = 1; i < W; i++) {
+			leftMax[i] = Math.max(leftMax[i-1], blocks[i]);
+		}
 		
-		for (int i = 1; i < blocks.length - 1; i++) {
-			int leftMax = 0;
-			int rightMax = 0;
-			
-			for (int l = 0; l < i; l++) {
-				leftMax = Math.max(leftMax, blocks[l]);
-			}
-			
-			for (int r = i + 1; r < blocks.length; r++) {
-				rightMax = Math.max(rightMax, blocks[r]);
-			}
-			
-			int curWater = Math.min(leftMax, rightMax) - blocks[i];
-			if (curWater > 0) {
-				cnt += curWater;
+		//오른쪽 최대 높이
+		int[] rightMax = new int[W];
+		rightMax[W-1] = blocks[W-1];
+		for (int i = W - 2; i >= 0; i--) {
+			rightMax[i] = Math.max(rightMax[i+1], blocks[i]);
+		}
+		
+		// 각 칸에서 빗물 계산
+		int cnt = 0;
+		for (int i = 1; i < W - 1; i++) {
+			int water = Math.min(leftMax[i], rightMax[i]) - blocks[i];
+			if (water > 0) {
+				cnt += water;
 			}
 		}
+		
 		System.out.println(cnt);
 	}// end of main
 }// end of class
