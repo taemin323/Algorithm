@@ -24,11 +24,13 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
 		int N = Integer.parseInt(br.readLine());
 		
 		int[] tops = new int[N];
 		int[] ans = new int[N];
 		ans[0] = 0;
+		sb.append(ans[0]).append(" ");
 		
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		for(int i = 0; i < N; i++) {
@@ -38,6 +40,7 @@ public class Main {
 		
 		Stack<Top> stack = new Stack<>();
 		stack.add(new Top(tops[0], 0));
+		
 		
 		for (int i = 1; i < N; i++) {
 			
@@ -51,10 +54,9 @@ public class Main {
 				ans[i] = stack.peek().idx + 1;
 			}
 			stack.push(new Top(tops[i], i));
+			sb.append(ans[i]).append(" ");
 		}
 		
-		for (int i = 0; i < ans.length; i++) {
-			System.out.print(ans[i] + " ");
-		}
+		System.out.println(sb.toString());
 	}//end of main
 }//end of class
