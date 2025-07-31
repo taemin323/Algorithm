@@ -53,6 +53,8 @@ public class Main {
 				int curR = cur[0];
 				int curC = cur[1];
 				
+				if(time > T) continue;
+				
 				if(curR == N - 1 && curC == M - 1) {
 				 min = Math.min(min, time);
 				}
@@ -60,7 +62,6 @@ public class Main {
 				if(map[curR][curC] == 2) {
 					int direct = time + (N - 1 - curR) + (M - 1 - curC);
 					min = Math.min(min, direct);
-					
 				}
 				
 				for (int d = 0; d < dc.length; d++) {
