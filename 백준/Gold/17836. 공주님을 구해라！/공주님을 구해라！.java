@@ -57,6 +57,7 @@ public class Main {
 				
 				if(curR == N - 1 && curC == M - 1) {
 				 min = Math.min(min, time);
+				 return min;
 				}
 				
 				if(map[curR][curC] == 2) {
