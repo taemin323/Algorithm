@@ -64,6 +64,9 @@ public class Main {
 		
 		while(!pq.isEmpty()) {
 			Node cur = pq.poll();
+			
+			if(cur.v == N) break;
+			
 			if (cur.cost > dist[cur.v]) {
 				continue;
 			}
