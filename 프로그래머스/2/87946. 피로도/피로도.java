@@ -9,11 +9,8 @@
 import java.util.*;
 
 class Solution {
-    boolean[] visited;
     int answer;
     public int solution(int k, int[][] dungeons) {
-        
-        visited = new boolean[dungeons.length];
         
         dfs(0, k, dungeons);
         
@@ -22,10 +19,11 @@ class Solution {
     
     public void dfs(int cnt, int k, int[][] dungeons) {
         for(int i = 0; i < dungeons.length; i++) {
-            if(!visited[i] && dungeons[i][0] <= k) {
-                visited[i] = true;
+            int tmp = dungeons[i][0];
+            if(dungeons[i][0] <= k) {
+                dungeons[i][0] = 9999;
                 dfs(cnt+1, k - dungeons[i][1], dungeons);
-                visited[i] = false;
+                dungeons[i][0] = tmp;
             }
         }
         answer = Math.max(answer, cnt);
