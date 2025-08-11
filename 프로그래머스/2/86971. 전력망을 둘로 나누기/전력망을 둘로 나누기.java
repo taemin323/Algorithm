@@ -1,64 +1,30 @@
-/**
-* 2 <= n <= 100 송전탑의 개수
-* wires의 원소 v1, v2는 서로 연결되어 있다는 의미. 1 <= v1 <= v2 <= n
-*/
 import java.util.*;
 
 class Solution {
-    List<List<Integer>> tree;
-    int N;
-    public int solution(int n, int[][] wires) {
-        int answer = Integer.MAX_VALUE;
-        N = n;
-        
-        tree = new ArrayList<>();
-        
-        for(int i = 0; i <= n; i++) {
-            tree.add(new ArrayList<Integer>());
+    int N, min = Integer.MAX_VALUE;
+    List<List<Integer>> g;
+    boolean[] vst;
+
+    int dfs(int n, int parent) {
+        int size = 1;
+        for (int next : g.get(n)) {
+            if (next == parent) continue;      // 트리라 parent로만 거슬러 올라감 방지
+            int sub = dfs(next, n);            // 자식 서브트리 크기
+            min = Math.min(min, Math.abs(sub - (N - sub))); // 간선 (n, next) 끊기
+            size += sub;
         }
-        
-        for(int i = 0; i < wires.length; i++) {
-            //송전탑 관계 구현
-            tree.get(wires[i][0]).add(wires[i][1]);
-            tree.get(wires[i][1]).add(wires[i][0]);
-        }
-        
-        for(int i = 0; i < wires.length; i++) {
-            int firstGroup = bfs(i, wires);
-            int secondGroup = n - firstGroup;
-            answer = Math.min(answer, Math.abs(firstGroup - secondGroup));
-            
-        }     
-    
-        return answer;
+        return size;
     }
-    
-    public int bfs(int idx, int[][] wires) {
-        // 해당 인덱스 삭제(전력망 끊기)
-        tree.get(wires[idx][0]).remove(Integer.valueOf(wires[idx][1]));
-        tree.get(wires[idx][1]).remove(Integer.valueOf(wires[idx][0]));
-        
-        Queue<Integer> q = new LinkedList<>();
-        boolean[] visited = new boolean[N+1];
-        
-        q.add(wires[idx][0]);
-        visited[wires[idx][0]] = true;
-        
-        int cnt = 0;
-        while(!q.isEmpty()) {
-            int cur = q.poll();
-            cnt++;
-            
-            for(int next : tree.get(cur)) {
-                if(!visited[next]) {
-                    visited[next] = true;
-                    q.add(next);
-                }
-            }
+
+    public int solution(int n, int[][] wires) {
+        N = n;
+        g = new ArrayList<>();
+        for (int i = 0; i <= n; i++) g.add(new ArrayList<>());
+        for (int[] w : wires) {
+            g.get(w[0]).add(w[1]);
+            g.get(w[1]).add(w[0]);
         }
-        tree.get(wires[idx][0]).add(wires[idx][1]);
-        tree.get(wires[idx][1]).add(wires[idx][0]);
-        
-        return cnt;
+        dfs(1, 0);
+        return min;
     }
 }
