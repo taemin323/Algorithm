@@ -21,27 +21,27 @@ public class Main {
 		}// 입력 완료
 		
 		int min = Integer.MAX_VALUE;
-		int[] answer = new int[2];
 		int left = 0;
 		int right = arr.length - 1;
+		
+		int ansL = 0;
+		int ansR = 0;
+		
 		while(left < right) {
 			int curSum = arr[left] + arr[right];
+			int abs = Math.abs(curSum);
 			
-			if(min > Math.abs(curSum)) {
-				min = Math.min(min, Math.abs(curSum));
-				answer[0] = arr[left];
-				answer[1] = arr[right];
+			if(min > abs) {
+				min = Math.min(min, abs);
+				ansL = arr[left];
+				ansR = arr[right];
+				if(min == 0) break;
 			}
 			
-			if(curSum == 0) break;
-			
-			if(curSum < 0) {
-				left++;
-			} else {
-				right--;
-			}
+			if(curSum < 0) left++;
+			else right--;
 		}
 		
-		System.out.println(answer[0] + " " + answer[1]);
+		System.out.println(ansL + " " + ansR);
 	}// end of main
 }//end of class
