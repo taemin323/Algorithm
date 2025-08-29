@@ -25,12 +25,14 @@ public class Main {
 		int right = 0;
 		
 		while(true) {
-			if(sum >= S) {
-				ans = Math.min(ans, right - left);
-				sum -= arr[left++];
-			} else {
+			if(sum < S) {
 				if(right == N) break;
-				sum += arr[right++];
+				sum += arr[right];
+				right++;
+			} else {
+				ans = Math.min(ans, right - left);
+				sum -= arr[left];
+				left++;
 			}
 		}
 		System.out.println(ans == Integer.MAX_VALUE ? 0 : ans);
