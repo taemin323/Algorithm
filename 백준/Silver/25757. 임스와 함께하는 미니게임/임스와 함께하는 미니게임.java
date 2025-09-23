@@ -15,32 +15,20 @@ public class Main {
 		int N = Integer.parseInt(st.nextToken());
 		String game = st.nextToken();
 		
-		String[] names = new String[N];
-		
-		for (int i = 0; i < N; i++) {
-			names[i] = br.readLine();
+		int limit;
+		switch(game) {
+			case "Y": limit = 1;
+			break;
+			case "F": limit = 2;
+			break;
+			default: limit = 3;
 		}
 		
 		Set<String> set = new HashSet<>();
-		int cnt = 0;
-		int total = 0;
-		int ans = 0;
-		
-		if(game.equals("Y")) total = 1;
-		else if(game.equals("F")) total = 2;
-		else total = 3;
-		
-		for (String name : names) {
-			if(!set.contains(name)) {
-				set.add(name);
-				cnt++;
-			}
-			
-			if(total - cnt == 0) {
-				cnt = 0;
-				ans++;
-			}
+	
+		for (int i = 0; i < N; i++) {
+			set.add(br.readLine());
 		}
-		System.out.println(ans);
+		System.out.println(set.size() / limit);
 	}// end of main
 }// end of class
