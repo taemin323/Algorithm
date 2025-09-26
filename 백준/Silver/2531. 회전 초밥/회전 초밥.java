@@ -1,59 +1,69 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 import java.util.StringTokenizer;
+/**
+ * 2 <= N <= 30,000 접시의 수
+ * 2 <= d <= 3,000 초밥의 가짓수
+ * 2 <= k <= 3,000 연속해서 먹는 접시의 수
+ * 1 <= c <= d 쿠폰 번호 c
+ */
+public class Main {	
+	private static int N;
+	private static int d;
+	private static int k;
+	private static int c;
+	private static int[] dishes;
+	private static HashSet<Integer> set;
+	private static LinkedList<Integer> q;
 
-public class Main {
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		d = Integer.parseInt(st.nextToken());
+		k = Integer.parseInt(st.nextToken());
+		c = Integer.parseInt(st.nextToken());
 		
-		int N = Integer.parseInt(st.nextToken());
-		int d = Integer.parseInt(st.nextToken());
-		int k = Integer.parseInt(st.nextToken());
-		int c = Integer.parseInt(st.nextToken());
-		
-		int[] sushi = new int[N];
-		int[] dishes = new int[d+1];
-		
-		
+		dishes = new int[N+k-1];
 		for (int i = 0; i < N; i++) {
-			sushi[i] = Integer.parseInt(br.readLine());
+			dishes[i] = Integer.parseInt(br.readLine());
+		}// 입력 완료
+		
+		int idx = 0;
+		for (int i = N; i < N+k-1; i++) {
+			dishes[i] = dishes[idx++];
 		}
 		
-		// 처음 0번부터 k개수만큼 먹었을 때의 초기화
+		// 초밥 번호의 개수
+		int[] sushi = new int[d+1];
 		int cnt = 0;
+		
+		// 초기 윈도우
 		for (int i = 0; i < k; i++) {
-			if(dishes[sushi[i]] == 0) {
+			if(sushi[dishes[i]]++ == 0) {
 				cnt++;
 			}
-			dishes[sushi[i]]++;// 해당 번호의 초밥을 먹었다면 개수 추가.
 		}
+		int ans = cnt + (sushi[c] == 0 ? 1 : 0);
 		
-		int max = cnt + (dishes[c] == 0 ? 1 : 0);
 		
-		
-		// 1번부터 N-1번까지 슬라이딩 윈도우하면된다.
 		for (int i = 1; i < N; i++) {
+			int left = dishes[i-1];
+			int right = dishes[i+k-1];
 			
-			int end = (i + k - 1) % N;
-			if(dishes[sushi[end]] == 0) {
-				cnt++;
-			}
-			dishes[sushi[end]]++;
+			if(--sushi[left] == 0) cnt--;
+			if(sushi[right]++ == 0) cnt++;
 			
-			// 한칸 이동 했으니 이전의 초밥 제거
-			dishes[sushi[i-1]]--;
-			if(dishes[sushi[i-1]] == 0) {
-				cnt--;// 해당 초밥이 0이면 윈도우 안에 없다는 것이므로 cnt -1
-			}
-			
-			int cur = cnt + (dishes[c] == 0 ? 1 : 0);
-		    if (cur > max) max = cur;
+			int cur = cnt + (sushi[c] == 0 ? 1 : 0);
+			ans = Math.max(ans, cur);
 		}
 		
-		System.out.println(max);
-		
-		
-	}//end of main
-}//end of class
+		System.out.println(ans);
+	}// end of main
+
+}// end of class
