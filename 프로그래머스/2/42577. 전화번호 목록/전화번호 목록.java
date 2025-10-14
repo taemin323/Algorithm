@@ -12,13 +12,17 @@ import java.util.*;
 class Solution {
     public boolean solution(String[] phone_book) {
         
-        Arrays.sort(phone_book);
+        Set<String> set = new HashSet<>();
+        for(String number : phone_book) {
+            set.add(number);
+        }
         
-        for(int i = 1; i < phone_book.length; i++) {
-            String cur = phone_book[i-1];
-            String next = phone_book[i];
-            
-            if(next.startsWith(cur)) return false;
+        for(String number : phone_book) {
+            for(int i = 1; i < number.length(); i++) {
+                if(set.contains(number.substring(0, i))) {
+                    return false;
+                }
+            }
         }
         
         return true;
