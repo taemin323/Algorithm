@@ -11,17 +11,38 @@ public class Main {
 		StringTokenizer st;
 		
 		int[][] board = new int[5][5];
-		visited = new boolean[5][5];
 		
+		// 숫자 -> 좌표 매핑
+		int[][] pos = new int[26][2];
 		for (int i = 0; i < 5; i++) {
 			st = new StringTokenizer(br.readLine(), " ");
-			for(int j = 0; j < 5; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
+			for (int j = 0; j < 5; j++) {
+				int v = Integer.parseInt(st.nextToken());
+				board[i][j] = v;
+				pos[v][0] = i;
+				pos[v][1] = j;
 			}
-		}// 철수 빙고판
+		}
 		
+		// 가로
+		int[] rCnt = new int[5];
+		
+		// 세로
+		int[] cCnt = new int[5];
+		
+		//우하향 대각선
+		int lrCnt = 0;
+		
+		//우상향 대각선
+		int rlCnt = 0;
+		
+		boolean[] rDone = new boolean[5];
+		boolean[] cDone = new boolean[5];
+		boolean lrDone = false;
+		boolean rlDone = false;
+		
+		int bingo = 0;
 		int answer = 0;
-		bingo = 0;
 		
 		for (int i = 0; i < 5; i++) {
 			st = new StringTokenizer(br.readLine(), " ");
@@ -29,67 +50,51 @@ public class Main {
 				int num = Integer.parseInt(st.nextToken());
 				answer++;
 				
+				int r = pos[num][0];
+				int c = pos[num][1];
 				
-				for(int r = 0; r < 5; r++) {
-					for(int c = 0; c < 5; c++) {
-						if(board[r][c] == num) {
-							visited[r][c] = true;
+				if(board[r][c] != -1) {
+					board[r][c] = -1;
+					
+					if(!rDone[r]) {
+						rCnt[r]++;
+						if(rCnt[r] == 5) {
+							rDone[r] = true;
+							bingo++;
 						}
 					}
+					
+					if(!cDone[c]) {
+						cCnt[c]++;
+						if(cCnt[c] == 5) {
+							cDone[c] = true;
+							bingo++;
+						}
+					}
+					
+					if(r == c && !lrDone) {
+						lrCnt++;
+						if(lrCnt == 5) {
+							lrDone = true;
+							bingo++;
+						}
+					}
+					
+					if(r + c == 4 && !rlDone) {
+						rlCnt++;
+						if(rlCnt == 5) {
+							rlDone = true;
+							bingo++;
+						}
+					}
+					
+					if(bingo >= 3) {
+						System.out.println(answer);
+						return;
+					}
 				}
-				
-				rCheck();
-				cCheck();
-				lrCheck();
-				rlCheck();
-				
-				
-				if(bingo >= 3) {
-					System.out.println(answer);
-					return;
-				}
-				bingo = 0;
 			}
 		}
 		
 	}// end of main
-	
-	// 오른쪽에서 왼쪽으로 그어지는 대각선	
-	private static void rlCheck() {
-		int cnt = 0;
-		for (int i = 0; i < 5; i++) {
-			if(visited[i][4-i]) cnt++;
-		}
-		if(cnt == 5) bingo++;
-	}
-
-	// 왼쪽에서 오른쪽으로 그어지는 대각선
-	private static void lrCheck() {
-		int cnt = 0;
-		for (int i = 0; i < 5; i++) {
-			if(visited[i][i]) cnt++;
-		}
-		if(cnt == 5) bingo++;
-	}
-
-	private static void cCheck() {
-		for (int i = 0; i < 5; i++) {
-			int cnt = 0;
-			for (int j = 0; j < 5; j++) {
-				if(visited[j][i]) cnt++;
-			}
-			if(cnt == 5) bingo++;
-		}
-	}
-
-	private static void rCheck() {
-		for (int i = 0; i < 5; i++) {
-			int cnt = 0;
-			for (int j = 0; j < 5; j++) {
-				if(visited[i][j]) cnt++;
-			}
-			if(cnt == 5) bingo++;
-		}
-	}
-
 }// end of class
