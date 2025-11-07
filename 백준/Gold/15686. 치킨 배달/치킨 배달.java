@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
@@ -23,11 +22,10 @@ public class Main {
 	private static int M;
 	private static int[][] map;
 	private static ArrayList<Point> storeList;
-	private static boolean[] visited;
 	private static int min;
-	private static int[] dr = {-1,1,0,0};
-	private static int[] dc = {0,0,-1,1};
-	private static int[][] memo;
+	private static ArrayList<Point> houseList;
+	private static boolean[] visited;
+	private static int[][] dist;
 	
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -38,6 +36,7 @@ public class Main {
 		
 		map = new int[N][N];
 		storeList = new ArrayList<Point>();
+		houseList = new ArrayList<Point>();
 		
 		for (int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine(), " ");
@@ -46,9 +45,27 @@ public class Main {
 				
 				if(map[i][j] == 2) {
 					storeList.add(new Point(i,j));
+				} else if(map[i][j] == 1) {
+					houseList.add(new Point(i,j));
 				}
 			}
 		}// 입력 완료
+		
+		int houseCnt = houseList.size();
+		int storeCnt = storeList.size();
+		
+		// i번째 집에서 j번째 치킨집까지의 거리
+		dist = new int[houseCnt][storeCnt];
+		
+		for (int i = 0; i < houseCnt; i++) {
+			Point house = houseList.get(i);
+			for (int j = 0; j < storeCnt; j++) {
+				Point store = storeList.get(j);
+				
+				int curDist = Math.abs(house.r - store.r) + Math.abs(house.c - store.c);
+				dist[i][j] = curDist;
+			}
+		}
 		
 		visited = new boolean[storeList.size()];
 		min = Integer.MAX_VALUE;
@@ -72,76 +89,19 @@ public class Main {
 	}
 
 	private static void calculate() {
-		int sum = 0;
+		int cityDistSum = 0;
 		
-		memo = new int[N][N];
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < N; j++) {
-				if(map[i][j] == 1) {
-					memo[i][j] = 1;
+		for (int i = 0; i < houseList.size(); i++) {
+			int chickenDist = Integer.MAX_VALUE;// 해당 집의 치킨거리
+			for (int j = 0; j < storeList.size(); j++) {
+				if(visited[j]) {
+					chickenDist = Math.min(chickenDist, dist[i][j]);
 				}
 			}
+			cityDistSum += chickenDist;
 		}
 		
-		for (int i = 0; i < storeList.size(); i++) {
-			if(visited[i]) {
-				Point curStore = storeList.get(i);
-				
-				int curR = curStore.r;
-				int curC = curStore.c;
-				
-				memo[curR][curC] = 2;
-			}
-		}
-		
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < N; j++) {
-				if(memo[i][j] == 1) {
-					int curDist = bfs(i,j);
-					sum += curDist;
-				}
-			}
-		}
-		
-		min = Math.min(min, sum);
+		min = Math.min(min, cityDistSum);
 	}
 
-	private static int bfs(int i, int j) {
-		boolean[][] isVisited = new boolean[N][N];
-		
-		Queue<int[]> q = new LinkedList<>();
-		q.add(new int[] {i, j});
-		
-		int dist = 0;
-		
-		while(!q.isEmpty()) {
-			int qSize = q.size();
-			for (int k = 0; k < qSize; k++) {
-				int[] cur = q.poll();
-				
-				int curR = cur[0];
-				int curC = cur[1];
-				
-				if(memo[curR][curC] == 2) {
-					return dist;
-				}
-				
-				for (int d = 0; d < 4; d++) {
-					int nr = curR + dr[d];
-					int nc = curC + dc[d];
-					
-					if(nr < 0 || nr >= N || nc < 0 || nc >= N) continue;
-					
-					if(!isVisited[nr][nc]) {
-						isVisited[nr][nc] = true;
-						q.add(new int[] {nr, nc});
-					}
-				
-				}
-			}
-			dist++;
-		}
-		
-		return dist;
-	}
 }// end of class
