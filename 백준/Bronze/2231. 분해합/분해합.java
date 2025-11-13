@@ -11,35 +11,33 @@ public class Main {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		
 		N = Integer.parseInt(br.readLine());
-		answer = Integer.MAX_VALUE;
+		answer = 0;
 
 		
 		
 		String num = String.valueOf(N);
-		int maxTen = (int) Math.pow(10, num.length()-1);
 		
-		int candidate = 1;
-		while(candidate < N) {
-			calculate(candidate, maxTen);
-			if(answer != Integer.MAX_VALUE) break;
-			candidate++;
+		int start = N - (num.length() * 9);
+		if(start < 1) {
+			start = 1;
 		}
 		
-		if(answer == Integer.MAX_VALUE) {
-			System.out.println(0);
-		} else {
-			System.out.println(answer);
+		for (int i = start; i < N; i++) {
+			int sum = i;
+			int tmp = i;
+			
+			while(tmp > 0) {
+				sum += tmp % 10;
+				tmp /= 10;
+			}
+			
+			if(sum == N) {
+				answer = i;
+				break;
+			}
 		}
+		
+		System.out.println(answer);
 	}// end of main
 
-	private static void calculate(int candidate, int maxTen) {
-		int tmp = candidate;
-		int sum = candidate;
-		while(maxTen >= 1) {
-			sum += candidate / maxTen;
-			candidate %= maxTen;
-			maxTen /= 10;
-		}
-		if(sum == N) answer = tmp;
-	}
 }// end of class
