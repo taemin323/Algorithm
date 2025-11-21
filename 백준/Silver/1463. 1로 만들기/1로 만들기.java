@@ -13,25 +13,12 @@ public class Main {
 		dp = new Integer[N+1];
 		dp[0] = dp[1] = 0;
 		
-		System.out.println(recur(N));
-		
-	}// end of main
-
-	private static int recur(int n) {
-		
-		if(dp[n] == null) {
-			if(n % 6 == 0) {
-				dp[n] = Math.min(recur(n-1), Math.min(recur(n / 3), recur(n / 2))) + 1;
-			} else if(n % 3 == 0) {
-				dp[n] = Math.min(recur(n / 3), recur(n-1)) + 1;
-			} else if(n % 2 == 0) {
-				dp[n] = Math.min(recur(n /2), recur(n-1)) + 1;
-			} else {
-				dp[n] = recur(n-1) + 1;
-			}
-			
+		for (int i = 2; i <= N; i++) {
+			dp[i] = dp[i-1] + 1;
+			if(i % 2 == 0) dp[i] = Math.min(dp[i], dp[i / 2] + 1);
+			if(i % 3 == 0) dp[i] = Math.min(dp[i], dp[i / 3] + 1);
 		}
 		
-		return dp[n];
-	}
+		System.out.println(dp[N]);
+	}// end of main
 }// end of class
