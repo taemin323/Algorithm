@@ -1,34 +1,41 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
+	
+
+
+	private static int N;
+	private static int M;
+	private static int maxH;
+	private static int[] trees;
+	private static int minH;
 
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		
-		int N = Integer.parseInt(st.nextToken());
-		long M = Integer.parseInt(st.nextToken());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
 		
-		int[] trees = new int[N];
-		int max = Integer.MIN_VALUE;
+		trees = new int[N];
+		
+		maxH = Integer.MIN_VALUE;
 		st = new StringTokenizer(br.readLine(), " ");
 		for (int i = 0; i < N; i++) {
 			trees[i] = Integer.parseInt(st.nextToken());
-			max = Math.max(max, trees[i]);
-		}// 입력 완료
-		
-		int answer = 0;
-		int left = 0;
-		int right = max;
-		
-		while(left <= right) {
-			int mid = (left + right) / 2;
-			long sum = 0;
 			
-			for(int i = 0; i < N; i++) {
+			maxH = Math.max(maxH, trees[i]);
+		}
+		
+		int left = 0;
+		int right = maxH;
+		int answer = 0;
+		while(left <= right) {
+			long sum = 0;
+			int mid = (left + right) / 2;
+			
+			for (int i = 0; i < N; i++) {
 				if(trees[i] > mid) {
 					sum += trees[i] - mid;
 				}
@@ -38,10 +45,10 @@ public class Main {
 				answer = mid;
 				left = mid + 1;
 			} else {
-				right = mid - 1;
+				right = mid -1;
 			}
+			
 		}
-		
 		System.out.println(answer);
 	}// end of main
 }// end of class
