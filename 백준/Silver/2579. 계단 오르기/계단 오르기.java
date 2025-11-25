@@ -17,7 +17,7 @@ public class Main {
 		}
 		
 		// dp[i] = i번째 계단에 도달할 수 있는 최대 점수
-		long[] dp = new long[N+1];
+		int[] dp = new int[N+1];
 		
 		dp[1] = step[1];
 		dp[2] = dp[1] + step[2];
