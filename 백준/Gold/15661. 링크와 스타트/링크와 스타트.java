@@ -1,9 +1,7 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.*;
+import java.io.*;
 
 public class Main {
-
 	private static int N;
 	private static int min = Integer.MAX_VALUE;
 	private static int[] row;
@@ -11,46 +9,47 @@ public class Main {
 
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
 
         N = Integer.parseInt(br.readLine());
-
-        int[][] w = new int[N][N];
+        
+        int[][] board = new int[N][N];
         row = new int[N];
         column = new int[N];
         int totalSum = 0;
+        
         for (int i = 0; i < N; i++) {
-        	StringTokenizer stn = new StringTokenizer(br.readLine());
-        	for (int j = 0; j < N; j++) {
-        		w[i][j] = Integer.parseInt(stn.nextToken());
-        		totalSum += w[i][j];
-        	}
-        }
-
+			st = new StringTokenizer(br.readLine(), " ");
+			for (int j = 0; j < N; j++) {
+				board[i][j] = Integer.parseInt(st.nextToken());
+				totalSum += board[i][j];
+			}
+		}
+        
         for (int i = 0; i < N; i++) {
-        	for (int j = 0; j < N; j++) {
-        		row[i] += w[i][j];
-        		column[i] += w[j][i];
-        	}
-        }
-
-        dfs(0, 0, totalSum);
-
+			for (int j = 0; j < N; j++) {
+				row[i] += board[i][j];
+				column[i] += board[j][i];
+			}
+		}
+        
+        dfs(0,0,totalSum);
         System.out.println(min);
-    }
+    }// end of main
 
-    private static void dfs(int depth, int idx, int cur) {
-    	if (depth > N - 1) {
-    		return;
-    	}
-    	
-    	// 언제 종료할 것인가?
-    	min = Math.min(min, Math.abs(cur));
+	private static void dfs(int idx, int cnt, int cur) {
+		if(cnt > N-1) {
+			return;
+		}
+		
+		min = Math.min(min, Math.abs(cur));
+		
+		if(idx > N-1) {
+			return;
+		}
+		
+		dfs(idx+1, cnt+1, cur - row[idx] - column[idx]);
+		dfs(idx+1, cnt, cur);
+	}
 
-    	if (idx > N - 1) {
-    		return;
-    	}
-
-    	dfs(depth + 1, idx + 1, cur - row[idx] - column[idx]);
-    	dfs(depth, idx + 1, cur);
-    }
-}
+}// end of class
