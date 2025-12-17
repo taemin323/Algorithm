@@ -15,57 +15,27 @@ public class Main {
 		StringTokenizer st;
 		StringBuilder sb = new StringBuilder();
 		
+		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+		
+		
 		N = Integer.parseInt(br.readLine());
-		cards = new int[N];
 
 		st = new StringTokenizer(br.readLine(), " ");
+		
 		for (int i = 0; i < N; i++) {
-			cards[i] = Integer.parseInt(st.nextToken());
+			int key = Integer.parseInt(st.nextToken());
+			
+			map.put(key, map.getOrDefault(key, 0)+1);
 		}
 		
-		Arrays.sort(cards);
-		
-		M = Integer.parseInt(br.readLine());
+		int M = Integer.parseInt(br.readLine());
 		
 		st = new StringTokenizer(br.readLine(), " ");
 		for (int i = 0; i < M; i++) {
-			int target = Integer.parseInt(st.nextToken());
+			int key = Integer.parseInt(st.nextToken());
 			
-			// 정렬 후 , x가 마지막으로 등장한 다음 인덱스 - x가 처음 등장한 인덱스를 해주면 x의 개수
-			int cnt = upperBound(target) - lowerBound(target);
-			sb.append(cnt).append(" ");
+			sb.append(map.getOrDefault(key, 0)).append(" ");
 		}
-		
 		System.out.println(sb.toString());
 	}// end of main
-
-	private static int lowerBound(int target) {
-		int left = 0, right = N;
-		
-		while(left < right) {
-			int mid = (left+right) / 2;
-			
-			if(cards[mid] >= target) {
-				right = mid;
-			} else {
-				left = mid + 1;
-			}
-		}
-		return left;
-	}
-
-	private static int upperBound(int target) {
-		int left = 0, right = N;
-		
-		while(left < right) {
-			int mid = (left+right) / 2;
-			
-			if(cards[mid] > target) {
-				right = mid;
-			} else {
-				left = mid + 1;
-			}
-		}
-		return left;
-	}
 }// end of class
