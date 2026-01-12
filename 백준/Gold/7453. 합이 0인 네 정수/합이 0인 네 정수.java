@@ -39,6 +39,7 @@ public class Main {
 				sumAB[idx--] = arrA[i] + arrB[j];
 			}
 		}
+		Arrays.sort(sumAB);
 			
 		// C와 D로 만들 수 있는 모든 합을 저장할 새로운 배열
 		sumCD = new int[N*N];
@@ -50,51 +51,42 @@ public class Main {
 		}
 		Arrays.sort(sumCD);
 		
-		
+		// 하나는 앞에서부터, 나머지 하나는 뒤에서부터
+		// sumAB에 2가 3개있고, sumCD에 -2가 4개있다면 0이 되는건 총 3*4개
+		int left = 0;
+		int right = N*N - 1;
 		long answer = 0;
-		for (int i = 0; i < N*N; i++) {
-			int target = -sumAB[i];
-
-			int low = lowerBound(sumCD, target);
-			int up = upperBound(sumCD, target);
+		
+		while(left < N*N && right >= 0) {
+			int num1 = sumAB[left];
+			int num2 = sumCD[right];
+			int sum = num1 + num2;
 			
-			//같은 합이 여러 개 존재할 수 있음. 똑같은 값이 몇개 있는지도 알아내야함.
-			// low = target이 처음 나타난 위치, up = target보다 큰 값이 처음 나타나는 위치
-			// 개수 = up - low
-			answer += (up - low);
+			if(sum == 0) {
+				long cnt1 = 0;
+				long cnt2 = 0;
+				
+				// sumAB에서 현재값과 똑같은 숫자들의 개수를 카운트
+				while(left < N*N && sumAB[left] == num1) {
+					cnt1++;
+					left++;
+				}
+
+				// sumCD에서 현재값과 똑같은 숫자들의 개수를 카운트
+				while(right >= 0 && sumCD[right] == num2) {
+					cnt2++;
+					right--;
+				}
+				
+				// 두 개수를 곱한 만큼 정답에 더한다
+				answer += cnt1 * cnt2;
+			} else if(sum < 0) {
+				left++;
+			} else {
+				right--;
+			}
 		}
 		System.out.println(answer);
 	}// end of main
 
-	private static int upperBound(int[] arr, int target) {
-		int left = 0;
-		int right = arr.length;
-		
-		while(left < right) {
-			int mid = left + (right - left) / 2;
-			
-			if(arr[mid] <= target) {
-				left = mid + 1;
-			} else {
-				right = mid;
-			}
-		}
-		return left;
-	}
-
-	private static int lowerBound(int[] arr, int target) {
-		int left = 0;
-		int right = arr.length;
-		
-		while(left < right) {
-			int mid = left + (right - left) / 2;
-			
-			if(arr[mid] >= target) {
-				right = mid;
-			} else {
-				left = mid + 1;
-			}
-		}
-		return left;
-	}
 }// end of class
