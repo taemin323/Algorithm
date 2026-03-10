@@ -1,22 +1,22 @@
 import java.util.*;
 
 class Solution {
-    class Node {
-        int inCnt = 0;
-        int outCnt = 0;
-        
+    class Info {
+        int inCnt;
+        int outCnt;
     }
     
     public int[] solution(int[][] edges) {
-        Map<Integer, Node> graph = new HashMap<>();
+        int[] answer = new int[4];
+        Map<Integer, Info> graph = new HashMap<>();
         
         for(int[] edge : edges) {
             int from = edge[0];
             int to = edge[1];
             
             // 노드가 처음 등장하면 생성
-            if(!graph.containsKey(from)) graph.put(from, new Node());
-            if(!graph.containsKey(to)) graph.put(to, new Node());
+            if(!graph.containsKey(from)) graph.put(from, new Info());
+            if(!graph.containsKey(to)) graph.put(to, new Info());
             
             graph.get(from).outCnt++;
             graph.get(to).inCnt++;
@@ -27,22 +27,25 @@ class Solution {
         int bar = 0;
         int eight = 0;
         
-        for(int i : graph.keySet()) {
-            Node node = graph.get(i);
+        for(int idx : graph.keySet()) {
+            Info cur = graph.get(idx);
             
-            if(node.outCnt >= 2 && node.inCnt == 0) {
-                startNode = i;
-            } else if(node.outCnt == 0) {
+            if(cur.outCnt >= 2 && cur.inCnt == 0) {
+                startNode = idx;
+            } else if(cur.outCnt == 0) {
                 bar++;
-            } else if(node.outCnt == 2 && node.inCnt >= 2) {
+            } else if(cur.outCnt == 2 && cur.inCnt >= 2) {
                 eight++;
             }
         }
         
-        // 도넛 갯수 : 전체 - 막대 - 8자
+        //도넛 갯수 : 전체 - 막대 - 8자
         donut = graph.get(startNode).outCnt - bar - eight;
         
-        int[] answer = {startNode, donut, bar, eight};
+        answer[0] = startNode;
+        answer[1] = donut;
+        answer[2] = bar;
+        answer[3] = eight;
         
         return answer;
     }
