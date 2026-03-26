@@ -1,37 +1,44 @@
-/**
-* 1 <= n <= 200
-* computer[i][i]는 항상 1
-*/
 import java.util.*;
 
 class Solution {
-    public int solution(int n, int[][] computers) {
-        int answer = 0;
-        boolean[] visited = new boolean[n];
-        
-        for (int i = 0; i < n; i++) {
-            if (!visited[i]) {
-                bfs(i, visited, computers);
-                answer++;
-            }
-        }        
-        return answer;
-    }
+    private int[] parent;
     
-    private static void bfs(int idx, boolean[] visited, int[][] computers) {
-        Queue<Integer> q = new LinkedList<>();
-        q.add(idx);
-        visited[idx] = true;
+    public int solution(int n, int[][] computers) {
         
-        while(!q.isEmpty()) {
-            int cur = q.poll();
-            for (int i = 0; i < computers.length; i++) {
-                if(!visited[i] && computers[cur][i] == 1) {
-                    q.add(i);
-                    visited[i] = true;
+        parent = new int[n];
+        for(int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+        
+        
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if(i == j) continue;
+                else if(computers[i][j] == 1) {
+                    union(i, j);
                 }
             }
         }
+        
+        Set<Integer> set = new HashSet<>();
+        for(int i = 0; i < n; i++) {
+            set.add(find(i));
+        }
+        
+        return set.size();
     }
     
+    private void union(int i, int j) {
+        int pi = find(i);
+        int pj = find(j);
+        
+        if(pi != pj) parent[pj] = pi;
+    }
+    
+    private int find(int x) {
+        if(parent[x] == x) return x;
+        
+        return parent[x] = find(parent[x]);
+        
+    }
 }
