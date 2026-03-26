@@ -1,62 +1,55 @@
 import java.util.*;
 
 class Solution {
-    static class Word {
+    class Word {
         String word;
-        int step;
+        int cnt;
         
-        Word(String word, int step) {
+        public Word(String word, int cnt) {
             this.word = word;
-            this.step = step;
+            this.cnt = cnt;
         }
-    }
-    
-    // target이 words 안에 있는지 확인
-    boolean check(String target, String[] words) {
-        for (String word: words){
-            if(word.equals(target)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // 두 단어가 한 글자만 다른지 확인
-    boolean isOneLetterDiff(String cur, String next) {
-        int diff = 0;
-        for(int i = 0; i < cur.length(); i++) {
-            if(cur.charAt(i) != next.charAt(i)) {
-                diff++;
-            }
-            if (diff > 1) return false;
-        }
-        return diff == 1;
     }
     
     public int solution(String begin, String target, String[] words) {
-        int cnt = 0;
+        int answer = 0;
         
         if(!check(target, words)) return 0;
         
         boolean[] visited = new boolean[words.length];
-        Queue<Word> q = new LinkedList<Word>();
-        q.add(new Word(begin, 0));
-
+        Queue<Word> q = new LinkedList<>();
+        q.offer(new Word(begin, 0));
+        
         while(!q.isEmpty()) {
             Word cur = q.poll();
             
-            if(cur.word.equals(target)) {
-                return cur.step;
-            }
+            if(cur.word.equals(target)) return cur.cnt;
             
-            for (int i = 0; i < words.length; i++) {
-                if(!visited[i] && isOneLetterDiff(cur.word, words[i])){
+            for(int i = 0; i < words.length; i++) {
+                if(!visited[i] && isDiff(cur.word, words[i])) {
                     visited[i] = true;
-                    q.add(new Word(words[i], cur.step+1));
+                    q.offer(new Word(words[i], cur.cnt + 1));
                 }
             }
         }
         
         return 0;
+    }
+    
+    private boolean check(String target, String[] words) {
+        for(String word : words) {
+            if(target.equals(word)) return true;
+        }
+        
+        return false;
+    }
+    
+    private boolean isDiff(String word1, String word2) {
+        int cnt = 0;
+        for(int i = 0; i < word1.length(); i++) {
+            if(word1.charAt(i) != word2.charAt(i)) cnt++;
+        }
+        
+        return cnt == 1;
     }
 }
