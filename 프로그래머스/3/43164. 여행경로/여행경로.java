@@ -3,14 +3,16 @@ import java.util.*;
 class Solution {
     private boolean[] visited;
     private String[] answer;
-    private boolean flag = false;
+    private boolean flag;
     
     public String[] solution(String[][] tickets) {
-        //티켓 자체를 도착지 기준으로 정렬
-        Arrays.sort(tickets, (a,b) -> a[1].compareTo(b[1]));
+        //정렬
+        Arrays.sort(tickets, (a,b) ->{
+            return a[1].compareTo(b[1]);
+        });
         
         visited = new boolean[tickets.length];
-        String[] path = new String[tickets.length+1];
+        String[] path = new String[tickets.length + 1];
         path[0] = "ICN";
         
         dfs("ICN", tickets, path, 0);
@@ -33,7 +35,6 @@ class Solution {
                 path[cnt+1] = tickets[i][1];
                 
                 dfs(tickets[i][1], tickets, path, cnt+1);
-                
                 visited[i] = false;
             }
         }
