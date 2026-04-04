@@ -1,79 +1,47 @@
 import java.util.*;
 
 class Solution {
-    private static final int INF = Integer.MAX_VALUE;
-    
-    private static class Node implements Comparable<Node>{
-        int to, cost;
-        
-        public Node() {
-        }
-        
-        public Node(int to, int cost) {
-            this.to = to;
-            this.cost = cost;
-        }
-        
-        @Override
-        public int compareTo(Node o) {
-            return this.cost - o.cost;
-        }
-    }
+    private List<int[]>[] graph;
     
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        List<List<Node>> graph = new ArrayList<>();
-        for(int i = 0; i <= n; i++) {
-            graph.add(new ArrayList<>());
-        }
+        // 플로이드 워셜 세팅
+        int[][] dist = new int[n+1][n+1];
+        int INF = 100_000_000;
         
-        //양방향 그래프
-        for(int[] fare : fares) {
-            int startNode = fare[0];
-            int endNode = fare[1];
-            int cost = fare[2];
-            
-            graph.get(startNode).add(new Node(endNode, cost));
-            graph.get(endNode).add(new Node(startNode, cost));
-        }
-        
-        int[] minS = dijkstra(n, s, graph);
-        int[] minA = dijkstra(n, a, graph);
-        int[] minB = dijkstra(n, b, graph);
-        
-        int answer = INF;
         for(int i = 1; i <= n; i++) {
-            if(minS[i] == INF || minA[i] == INF || minB[i] == INF) {
-                continue;
-            }
-            
-            int total = minS[i] + minA[i] + minB[i];
-            answer = Math.min(answer, total);
+            Arrays.fill(dist[i], INF);
+            dist[i][i] = 0;
         }
-        return answer;
-    }
-    
-    private int[] dijkstra(int n, int startNode, List<List<Node>> graph) {
-        int[] minFare = new int[n+1];
-        Arrays.fill(minFare, INF);
-        minFare[startNode] = 0;
         
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        pq.add(new Node(startNode, 0));
+        // 플로이드 워셜 채우기
+        for(int i = 0; i < fares.length; i++) {
+            int from = fares[i][0];
+            int to = fares[i][1];
+            int cost = fares[i][2];
+            
+            dist[from][to] = cost;
+            dist[to][from] = cost;
+        }
         
-        while(!pq.isEmpty()) {
-            Node cur = pq.poll();
-            
-            if(cur.cost > minFare[cur.to]) continue;
-            
-            for(Node near : graph.get(cur.to)) {
-                int newFare = cur.cost + near.cost;
-                
-                if(newFare < minFare[near.to]) {
-                    minFare[near.to] = newFare;
-                    pq.add(new Node(near.to, newFare));
+        for(int k = 1; k <= n; k++) {
+            for(int i = 1; i <= n; i++) {
+                for(int j = 1; j <= n; j++) {
+                    if(dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];    
+                    }
                 }
             }
         }
-        return minFare;
+        
+        // 각자 가는 방법 vs 합승 후 각자
+        int answer = Integer.MAX_VALUE;
+        for(int i = 1; i <= n; i++) {
+            // i == s인 경우 처음부터 따로 출발한 것과 같음.
+            int cur = dist[s][i] + dist[i][a] + dist[i][b];
+            
+            answer = Math.min(answer, cur);
+        }
+        
+        return answer;
     }
 }
