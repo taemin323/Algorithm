@@ -1,23 +1,24 @@
+import java.util.*;
+
 class Solution {
     public int solution(int[][] sizes) {
-        int N = sizes.length;
-        int M = sizes[0].length;
-            
-        int maxWidth = 0;
-        int maxLength = 0;
+        int w = 0;
+        int h = 0;
         
-        for (int r = 0; r < N; r++) {
-            for (int c = 0; c < M; c++){
-                maxWidth = Math.max(maxWidth, sizes[r][c]);
+        for(int i = 0; i < sizes.length; i++) {
+            if(sizes[i][0] > sizes[i][1]) {
+                int tmp = sizes[i][0];
+                sizes[i][0] = sizes[i][1];
+                sizes[i][1] = tmp;
             }
         }
         
-        for (int i = 0; i < N; i++) {
-            int length = Math.min(sizes[i][0], sizes[i][1]);
-            maxLength = Math.max(maxLength, length);
+        for(int i = 0; i < sizes.length; i++) {
+            w = Math.max(w, sizes[i][0]);
+            h = Math.max(h, sizes[i][1]);
         }
         
-        int answer = maxWidth * maxLength;
+        int answer = w * h;
         return answer;
     }
 }
