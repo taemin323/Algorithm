@@ -6,17 +6,10 @@ class Solution {
         int h = 0;
         
         for(int i = 0; i < sizes.length; i++) {
-            if(sizes[i][0] > sizes[i][1]) {
-                int tmp = sizes[i][0];
-                sizes[i][0] = sizes[i][1];
-                sizes[i][1] = tmp;
-            }
+            w = Math.max(w, Math.max(sizes[i][0], sizes[i][1]));
+            h = Math.max(h, Math.min(sizes[i][0], sizes[i][1]));
         }
         
-        for(int i = 0; i < sizes.length; i++) {
-            w = Math.max(w, sizes[i][0]);
-            h = Math.max(h, sizes[i][1]);
-        }
         
         int answer = w * h;
         return answer;
