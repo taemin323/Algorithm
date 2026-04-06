@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.IntStream;
 
 class Solution {
     public int[] solution(int[] answers) {
@@ -20,6 +21,9 @@ class Solution {
             if(maxCnt == scores[i]) list.add(i);
         }
         
-        return list.stream().mapToInt(i -> i).toArray();
+        // return list.stream().mapToInt(i -> i).toArray();
+        return IntStream.range(1,4)
+                        .filter(i -> scores[i] == maxCnt)
+                        .toArray();
     }
 }
