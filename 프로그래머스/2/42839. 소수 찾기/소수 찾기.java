@@ -1,32 +1,35 @@
 import java.util.*;
 
 class Solution {
+    Set<Integer> set;
+    
     public int solution(String numbers) {
         int answer = 0;
         
-        HashSet<Integer> set = new HashSet<>();
+        set = new HashSet<>();
         
-        perm("", numbers, set);        
+        perm("", numbers);
         
         for(int num : set) {
             if(isPrime(num)) answer++;
         }
-        
         return answer;
     }
     
-    public void perm(String prev, String numbers, HashSet<Integer> set) {
-        if(!prev.equals("")) set.add(Integer.parseInt(prev));
+    public void perm(String prev, String numbers) {
+        if(!prev.equals("")) set.add(Integer.valueOf(prev));
         
         for(int i = 0; i < numbers.length(); i++) {
-            perm(prev + numbers.charAt(i), numbers.substring(0,i) + numbers.substring(i+1, numbers.length()), set);
+            perm(prev + numbers.charAt(i), numbers.substring(0, i) + numbers.substring(i+1, numbers.length()));
         }
     }
     
     public boolean isPrime(int n) {
-        if(n == 0 || n == 1) return false;
+        if(n < 2) return false;
         
-        for(int i = 2; i <= Math.sqrt(n); i++) {
+        for(int i = 2; i <= n; i++) {
+            if(n == i) continue;
+            
             if(n % i == 0) return false;
         }
         
