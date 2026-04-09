@@ -1,23 +1,31 @@
 import java.util.*;
 
 class Solution {
-    List<String> list = new ArrayList<>();
+    StringBuilder sb = new StringBuilder();
+    int answer = 0;
+    int cnt = 0;
     
     public int solution(String word) {
-        
-        dfs("", 0);
-        
-        return list.indexOf(word);
+        dfs(0, word);
+        return answer;
     }
     
-    void dfs(String str, int len) {
+    void dfs(int len, String target) {
         if(len > 5) return;
         
-        list.add(str);
+        if(len > 0) {
+            cnt++;
+            
+            if(sb.toString().equals(target)) {
+                answer = cnt;
+                return;
+            }
+        }
         
         for(int i = 0; i < 5; i++) {
-            String next = str + "AEIOU".charAt(i);
-            dfs(next, len+1);
+            sb.append("AEIOU".charAt(i));
+            dfs(len+1, target);
+            sb.deleteCharAt(sb.length() - 1);
         }
     }
 }
