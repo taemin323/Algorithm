@@ -11,7 +11,6 @@ public class Main {
 	private static int robotR;
 	private static int robotC;
 	private static int robotD;
-	private static int answer = 0;
 	
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -33,46 +32,43 @@ public class Main {
 			}
 		}
 		
-		move(robotR, robotC, robotD);
+		int answer = 0;
+		
+		while(true) {
+			if(map[robotR][robotC] == 0) {
+				map[robotR][robotC] = 2;
+				answer++;
+			}
 			
+			boolean flag = false;
+			
+			//주변 탐색
+			for (int d = 0; d < 4; d++) {
+				robotD = (robotD + 3) % 4;
+				int nr = robotR + dr[robotD];
+				int nc = robotC + dc[robotD];
+				
+				if(map[nr][nc] == 0) {
+					robotR = nr;
+					robotC = nc;
+					flag = true;
+					break;
+				}
+			}
+			
+			// 빈 칸 없는 경우
+			if(!flag) {
+				int backD = (robotD+2) % 4;
+				int backR = robotR + dr[backD];
+				int backC = robotC + dc[backD];
+				
+				if(map[backR][backC] == 1) break;
+				robotR = backR;
+				robotC = backC;
+			}
+		}
+		
 		System.out.println(answer);
 	}
 
-	private static void move(int curR, int curC, int curD) {
-		
-		if(map[curR][curC] == 0) {
-			 map[curR][curC] = 2;// 청소 처리
-			 answer++;
-		}
-		
-		boolean flag = false;
-		int nd = curD;
-		for(int k = 0; k < 4; k++) {
-			nd = (nd + 3) % 4;
-			int nr = curR + dr[nd];
-			int nc = curC + dc[nd];
-			
-			if(nr < 0 || nr >= N || nc < 0 || nc >= M) continue;
-			
-			if(map[nr][nc] == 0) {
-				move(nr, nc, nd);
-				flag = true;
-				break;
-			}
-			
-		}
-		
-		// 주변에 청소되지 않은 빈 칸이 없는 경우
-		if(!flag) {
-			//후진 처리
-			int nextD = (curD+2) % 4;
-			int nextR = curR + dr[nextD];
-			int nextC = curC + dc[nextD];
-			
-			if(map[nextR][nextC] == 1) return;
-			move(nextR, nextC, curD);
-		}
-		
-	
-	}
 }
