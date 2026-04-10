@@ -1,15 +1,18 @@
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
 public class Main {
 	private static int N;
 	private static int M;
-	private static int[][] map;
 	private static int[] dr = {-1,0,1,0};//북동남서
-	private static int[] dc = {0,1,0,-1};
-	private static int answer = 1;
-
+	private static int[] dc = {0,1,0,-1};//북동남서
+	private static int[][] map;
+	private static int robotR;
+	private static int robotC;
+	private static int robotD;
+	private static int answer = 0;
+	
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
@@ -18,11 +21,9 @@ public class Main {
 		M = Integer.parseInt(st.nextToken());
 		
 		st = new StringTokenizer(br.readLine(), " ");
-		int startR = Integer.parseInt(st.nextToken());
-		int startC = Integer.parseInt(st.nextToken());
-		
-		// 0 : 북쪽, 1 : 동쪽, 2 : 남쪽, 3 : 서쪽
-		int dir = Integer.parseInt(st.nextToken());
+		robotR = Integer.parseInt(st.nextToken());
+		robotC = Integer.parseInt(st.nextToken());
+		robotD = Integer.parseInt(st.nextToken());
 		
 		map = new int[N][M];
 		for (int i = 0; i < N; i++) {
@@ -30,39 +31,48 @@ public class Main {
 			for (int j = 0; j < M; j++) {
 				map[i][j] = Integer.parseInt(st.nextToken());
 			}
-		}// 입력 완료
+		}
 		
-		clean(startR, startC, dir);
-		System.out.println(answer);
-		
-	}// end of main
-
-	private static void clean(int startR, int startC, int dir) {
-		map[startR][startC] = 2;
-		
-		for (int i = 0; i < 4; i++) {
-			dir = (dir+3)%4;
+		move(robotR, robotC, robotD);
 			
-			int nr = startR + dr[dir];
-			int nc = startC + dc[dir];
+		System.out.println(answer);
+	}
+
+	private static void move(int curR, int curC, int curD) {
+		
+		if(map[curR][curC] == 0) {
+			 map[curR][curC] = 2;// 청소 처리
+			 answer++;
+		}
+		
+		boolean flag = false;
+		int nd = curD;
+		for(int k = 0; k < 4; k++) {
+			nd = (nd + 3) % 4;
+			int nr = curR + dr[nd];
+			int nc = curC + dc[nd];
 			
 			if(nr < 0 || nr >= N || nc < 0 || nc >= M) continue;
 			
 			if(map[nr][nc] == 0) {
-				answer++;
-				clean(nr, nc, dir);
-				return;
+				move(nr, nc, nd);
+				flag = true;
+				break;
 			}
+			
 		}
 		
-		int d = (dir+2) % 4; // 반대 방향으로 후진
-		int br = startR + dr[d];
-		int bc = startC + dc[d];
-		
-		if(br >= 0 && br < N && bc >= 0 && bc < M && map[br][bc] != 1) {
-			clean(br, bc, dir);//후진이니까 바라보는 방향은 유지
+		// 주변에 청소되지 않은 빈 칸이 없는 경우
+		if(!flag) {
+			//후진 처리
+			int nextD = (curD+2) % 4;
+			int nextR = curR + dr[nextD];
+			int nextC = curC + dc[nextD];
+			
+			if(map[nextR][nextC] == 1) return;
+			move(nextR, nextC, curD);
 		}
 		
-		
+	
 	}
-}//end of class
+}
