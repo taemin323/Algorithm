@@ -5,12 +5,13 @@ import java.io.InputStreamReader;
 public class Main {
 	private static int N;
 	private static int M;
-	private static int[] dr = {-1,0,1,0};//북동남서
-	private static int[] dc = {0,1,0,-1};//북동남서
 	private static int[][] map;
-	private static int robotR;
-	private static int robotC;
-	private static int robotD;
+	private static int curR;
+	private static int curC;
+	private static int curD;
+	private static int[] dr = {-1,0,1,0};//북동남서
+	private static int[] dc = {0,1,0,-1};
+	
 	
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -20,14 +21,16 @@ public class Main {
 		M = Integer.parseInt(st.nextToken());
 		
 		st = new StringTokenizer(br.readLine(), " ");
-		robotR = Integer.parseInt(st.nextToken());
-		robotC = Integer.parseInt(st.nextToken());
-		robotD = Integer.parseInt(st.nextToken());
+		
+		curR = Integer.parseInt(st.nextToken());
+		curC = Integer.parseInt(st.nextToken());
+		curD = Integer.parseInt(st.nextToken());
 		
 		map = new int[N][M];
-		for (int i = 0; i < N; i++) {
+		
+		for(int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine(), " ");
-			for (int j = 0; j < M; j++) {
+			for(int j = 0; j < M; j++) {
 				map[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
@@ -35,40 +38,46 @@ public class Main {
 		int answer = 0;
 		
 		while(true) {
-			if(map[robotR][robotC] == 0) {
-				map[robotR][robotC] = 2;
+			// 현재 칸 청소
+			if(map[curR][curC] == 0) {
+				map[curR][curC] = 2;
 				answer++;
 			}
 			
 			boolean flag = false;
 			
-			//주변 탐색
-			for (int d = 0; d < 4; d++) {
-				robotD = (robotD + 3) % 4;
-				int nr = robotR + dr[robotD];
-				int nc = robotC + dc[robotD];
+			int nd = curD;
+			//현재 칸의 주변 4칸 탐색
+			for(int i = 0; i < 4; i++) {
+				nd = (nd+3)%4;
+				int nr = curR + dr[nd];
+				int nc = curC + dc[nd];
+				
+				if(nr < 0 || nr >= N || nc < 0 || nc >= M) continue;
 				
 				if(map[nr][nc] == 0) {
-					robotR = nr;
-					robotC = nc;
 					flag = true;
+					curR = nr;
+					curC = nc;
+					curD = nd;
 					break;
 				}
 			}
 			
-			// 빈 칸 없는 경우
+			// 주변에 청소되지 않은 빈 칸이 없는 경우
 			if(!flag) {
-				int backD = (robotD+2) % 4;
-				int backR = robotR + dr[backD];
-				int backC = robotC + dc[backD];
+				int backR = curR + dr[(curD+2)%4];
+				int backC = curC + dc[(curD+2)%4];
+				
+				if(backR < 0 || backR >= N || backC < 0 || backC >= M) continue;
 				
 				if(map[backR][backC] == 1) break;
-				robotR = backR;
-				robotC = backC;
+				
+				curR = backR;
+				curC = backC;
 			}
 		}
 		
 		System.out.println(answer);
 	}
-
 }
