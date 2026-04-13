@@ -1,31 +1,26 @@
 import java.util.*;
 
 class Solution {
-    StringBuilder sb = new StringBuilder();
     int answer = 0;
     int cnt = 0;
     
     public int solution(String word) {
-        dfs(0, word);
+        
+        dfs("", word, 0);       
         return answer;
     }
     
-    void dfs(int len, String target) {
-        if(len > 5) return;
-        
-        if(len > 0) {
-            cnt++;
-            
-            if(sb.toString().equals(target)) {
-                answer = cnt;
-                return;
-            }
+    void dfs(String str, String target, int depth) {
+        if(str.equals(target)) {
+            answer = cnt;
+            return;
         }
         
+        if(depth == 5) return;
+        
         for(int i = 0; i < 5; i++) {
-            sb.append("AEIOU".charAt(i));
-            dfs(len+1, target);
-            sb.deleteCharAt(sb.length() - 1);
+            cnt++;
+            dfs(str + "AEIOU".charAt(i), target, depth+1);
         }
     }
 }
