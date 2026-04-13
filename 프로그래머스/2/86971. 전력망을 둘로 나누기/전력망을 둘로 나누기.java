@@ -1,42 +1,45 @@
 import java.util.*;
 
 class Solution {
-    int[][] tree;
+    List<List<Integer>> list;
     boolean[] visited;
-    int N;
     int answer = Integer.MAX_VALUE;
-     
+    
     public int solution(int n, int[][] wires) {
-        N = n;
-        tree = new int[n+1][n+1];
+        
         visited = new boolean[n+1];
         
+        list = new ArrayList<>();
+        for(int i = 0; i <= n; i++) {
+            list.add(new ArrayList<>());
+        }
         
-        //tree 구성
         for(int i = 0; i < wires.length; i++) {
             int from = wires[i][0];
             int to = wires[i][1];
             
-            tree[from][to] = 1;
-            tree[to][from] = 1;
+            list.get(from).add(to);
+            list.get(to).add(from);
         }
         
-        dfs(1);
+        dfs(1, n);
         return answer;
     }
     
-    public int dfs(int cur) {
-        visited[cur] = true;
-        int child = 1;
+    int dfs(int idx, int n) {
+        visited[idx] = true;
         
-        for(int i = 1; i <= N; i++) {
-            if(!visited[i] && tree[cur][i] == 1) {
+        int child = 1;// 자기 자신 포함
+        
+        for(Integer i : list.get(idx)) {
+            if(!visited[i] && list.get(idx).contains(i)) {
                 visited[i] = true;
-                child += dfs(i);
+                
+                child += dfs(i, n);
             }
         }
         
-        answer = Math.min(answer, Math.abs(child - (N-child)));
+        answer = Math.min(answer, Math.abs(child - (n - child)));
         return child;
     }
 }
