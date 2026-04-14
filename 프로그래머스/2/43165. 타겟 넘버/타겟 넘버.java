@@ -1,22 +1,30 @@
 import java.util.*;
-/**
-* +, - 2가지 길을 고르면서 가는것.
-* 깊이 우선 탐색 타겟 넘버까지 갔다가 되돌아와야함
-*/
 
 class Solution {
+    int answer = 0;
+    String[] ops;
+    
     public int solution(int[] numbers, int target) {
-        return dfs(0, 0, numbers, target);
+        ops = new String[numbers.length];
+        dfs(0, 0, numbers, target);
+        return answer;
     }
     
-    private int dfs(int idx, int result, int[] numbers, int target) {
-        if(idx == numbers.length) {
-            return result == target ? 1 : 0;
+    void dfs(int depth, int idx, int[] numbers, int target) {
+        if(depth == ops.length) {
+            int sum = 0;
+            for(int i = 0; i < ops.length; i++) {
+                if(ops[i].equals("+")) sum += numbers[i];
+                else sum -= numbers[i];
+            }
+            
+            if(sum == target) answer++;
+            return;
         }
         
-        int withPlus = dfs(idx + 1, result + numbers[idx], numbers, target);
-        int withMinus = dfs(idx + 1, result - numbers[idx], numbers, target);
-        
-        return withPlus + withMinus;
+        ops[idx] = "+";
+        dfs(depth+1, idx+1, numbers, target);
+        ops[idx] = "-";
+        dfs(depth+1, idx+1, numbers, target);
     }
 }
