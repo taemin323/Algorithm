@@ -1,48 +1,41 @@
 import java.util.*;
 
 class Solution {
-    List<HashSet<Integer>> graph = new ArrayList<>();
-    boolean[] visited;
+    int[] parent;
     
     public int solution(int n, int[][] computers) {
-        for(int i = 0; i < n; i ++) {
-            graph.add(new HashSet<>());
+        parent = new int[n];
+        for(int i = 0; i < n; i++) {
+            parent[i] = i;
         }
         
-        visited = new boolean[n+1];
-        
         for(int i = 0; i < n; i++) {
-            int curIdx = i;
-            for(int j = 0; j < n; j++) {
-                if(i == j) continue;
-                
+            for(int j = i+1; j < n; j++) {
                 if(computers[i][j] == 1) {
-                    graph.get(i).add(j);
-                    graph.get(j).add(i);
+                    union(i, j);
                 }
             }
-            
         }
         
-        int answer = 0;
-        
-        for(int i = 0; i < n; i++) {
-            if(!visited[i]) {
-                visited[i] = true;
-                dfs(i);
-                answer++;
-            }    
+        Set<Integer> set = new HashSet<>();
+        for(int i : parent) {
+            set.add(find(i));
         }
-            
-        return answer;
+        
+        return set.size();
     }
     
-    void dfs(int idx) {
-        for(int i : graph.get(idx)) {
-            if(!visited[i]) {
-                visited[i] = true;
-                dfs(i);
-            }
+    void union(int i, int j) {
+        int pi = find(i);
+        int pj = find(j);
+        
+        if(pi != pj) {
+            parent[pj] = pi;
         }
+    }
+    
+    int find(int i) {
+        if(parent[i] == i) return i;
+        return parent[i] = find(parent[i]);
     }
 }
