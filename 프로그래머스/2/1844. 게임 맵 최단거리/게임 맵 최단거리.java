@@ -1,64 +1,52 @@
 import java.util.*;
 
 class Solution {
-    static class Point {
-        int r, c;
-        
-        public Point() {
-        }
-        
-        public Point(int r, int c) {
-            this.r = r;
-            this.c = c;
-        }
-    }
-    
-    private static int N;
-    private static int M;
-    private static int[] dr = {0,0,-1,1};
-    private static int[] dc = {-1,1,0,0};
-    private static boolean[][] visited;
-    private static int[][] dist;
+    boolean[][] visited;
+    int[] dr = {-1,1,0,0};
+    int[] dc = {0,0,-1,1};
+    int n;
+    int m;
+    int answer = 0;
     
     public int solution(int[][] maps) {
-        N = maps.length;
-        M = maps[0].length;
+        n = maps.length;
+        m = maps[0].length;
+        visited = new boolean[n][m];
         
-        if(maps[0][0] == 0) return -1;
+        bfs(0,0,maps);
         
-        visited = new boolean[N][M];
-        dist = new int[N][M];
+        if(answer == 0) return -1;
         
-        return bfs(0,0, maps);
+        return answer;
     }
     
-    private int bfs(int r, int c, int[][] maps) {
-        Queue<Point> q = new LinkedList<>();
+    void bfs(int r, int c, int[][] maps) {
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(new int[] {r, c , 1});
         visited[r][c] = true;
-        dist[r][c] = 1;
-        q.add(new Point(r, c));
         
         while(!q.isEmpty()) {
-            Point cur = q.poll();
-            int curR = cur.r;
-            int curC = cur.c;
+            int[] cur = q.poll();
+            int curR = cur[0];
+            int curC = cur[1];
+            int curDist = cur[2];
             
-            if(curR == N-1 && curC == M-1) return dist[curR][curC];
+            if(curR == n-1 && curC == m-1) {
+                answer = curDist;
+            }
             
-            for(int d = 0; d < dc.length; d++){
+            for(int d = 0; d < 4; d++) {
                 int nr = curR + dr[d];
                 int nc = curC + dc[d];
                 
-                if(nr < 0 || nr >= N || nc < 0 || nc >= M) continue;
+                if(nr < 0 || nr >= n || nc < 0 || nc >= m) continue;
                 
                 if(!visited[nr][nc] && maps[nr][nc] == 1) {
                     visited[nr][nc] = true;
-                    dist[nr][nc] = dist[curR][curC] + 1;
-                    q.add(new Point(nr, nc));
+                    q.offer(new int[] {nr, nc, curDist+1});
                 }
             }
         }
         
-        return -1;
     }
 }
