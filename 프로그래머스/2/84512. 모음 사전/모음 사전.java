@@ -2,25 +2,25 @@ import java.util.*;
 
 class Solution {
     int answer = 0;
-    int cnt = 0;
-    
+    List<String> list = new ArrayList<>();
     public int solution(String word) {
+        dfs("", 0);
         
-        dfs("", word, 0);       
+        for(int i = 0; i < list.size(); i++) {
+            if(list.get(i).equals(word)) answer = i;
+        }
+        
         return answer;
     }
     
-    void dfs(String str, String target, int depth) {
-        if(str.equals(target)) {
-            answer = cnt;
-            return;
-        }
+    void dfs(String str, int depth) { 
+        
+        list.add(str);
         
         if(depth == 5) return;
         
         for(int i = 0; i < 5; i++) {
-            cnt++;
-            dfs(str + "AEIOU".charAt(i), target, depth+1);
+            dfs(str + "AEIOU".charAt(i), depth+1);
         }
     }
 }
