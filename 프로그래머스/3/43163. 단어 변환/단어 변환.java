@@ -11,40 +11,47 @@ class Solution {
         }
     }
     
+    boolean[] visited;
+    int answer = Integer.MAX_VALUE;
     public int solution(String begin, String target, String[] words) {
-        int answer = 0;
+        visited = new boolean[words.length];
         
         if(!check(target, words)) return 0;
         
-        boolean[] visited = new boolean[words.length];
+        bfs(begin, target, words, 0);
+        
+        return answer;
+    }
+    
+    void bfs(String begin, String target, String[] words, int cnt) {
         Queue<Word> q = new LinkedList<>();
         q.offer(new Word(begin, 0));
         
         while(!q.isEmpty()) {
             Word cur = q.poll();
             
-            if(cur.word.equals(target)) return cur.cnt;
+            if(cur.word.equals(target)) {
+                answer = cur.cnt;
+                return;
+            }
             
             for(int i = 0; i < words.length; i++) {
                 if(!visited[i] && isDiff(cur.word, words[i])) {
                     visited[i] = true;
-                    q.offer(new Word(words[i], cur.cnt + 1));
+                    q.offer(new Word(words[i], cur.cnt+1));
                 }
             }
         }
-        
-        return 0;
     }
     
-    private boolean check(String target, String[] words) {
+    boolean check(String target, String[] words) {
         for(String word : words) {
-            if(target.equals(word)) return true;
+            if(word.equals(target)) return true;
         }
-        
         return false;
     }
     
-    private boolean isDiff(String word1, String word2) {
+    boolean isDiff(String word1, String word2) {
         int cnt = 0;
         for(int i = 0; i < word1.length(); i++) {
             if(word1.charAt(i) != word2.charAt(i)) cnt++;
