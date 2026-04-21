@@ -1,58 +1,48 @@
 import java.util.*;
+/**
+* 가장 짧은 변환 과정 -> BFS
+*/
 
 class Solution {
-    class Word {
-        String word;
-        int cnt;
-        
-        public Word(String word, int cnt) {
-            this.word = word;
-            this.cnt = cnt;
-        }
-    }
-    
-    boolean[] visited;
-    int answer = Integer.MAX_VALUE;
     public int solution(String begin, String target, String[] words) {
-        visited = new boolean[words.length];
+        int answer = 0;
+        boolean[] visited = new boolean[words.length];
         
-        if(!check(target, words)) return 0;
+        if(!isWords(target, words)) return 0;
         
-        bfs(begin, target, words, 0);
+        Queue<String> q = new LinkedList<>();
+        q.offer(begin);
+        
+        while(!q.isEmpty()) {
+            int qSize = q.size();
+            for(int k = 0; k < qSize; k++) {
+                String cur = q.poll();
+                
+                if(cur.equals(target)) return answer;
+                
+                for(int i = 0; i < words.length; i++) {
+                    if(!visited[i] && isDiff(cur, words[i])) {
+                        visited[i] = true;
+                        q.offer(words[i]);
+                    }
+                }
+            }
+            answer++;
+        }
         
         return answer;
     }
     
-    void bfs(String begin, String target, String[] words, int cnt) {
-        Queue<Word> q = new LinkedList<>();
-        q.offer(new Word(begin, 0));
-        
-        while(!q.isEmpty()) {
-            Word cur = q.poll();
-            
-            if(cur.word.equals(target)) {
-                answer = cur.cnt;
-                return;
-            }
-            
-            for(int i = 0; i < words.length; i++) {
-                if(!visited[i] && isDiff(cur.word, words[i])) {
-                    visited[i] = true;
-                    q.offer(new Word(words[i], cur.cnt+1));
-                }
-            }
-        }
-    }
-    
-    boolean check(String target, String[] words) {
+    boolean isWords(String target, String[] words) {
         for(String word : words) {
-            if(word.equals(target)) return true;
+            if(target.equals(word)) return true;
         }
         return false;
     }
     
     boolean isDiff(String word1, String word2) {
         int cnt = 0;
+        
         for(int i = 0; i < word1.length(); i++) {
             if(word1.charAt(i) != word2.charAt(i)) cnt++;
         }
