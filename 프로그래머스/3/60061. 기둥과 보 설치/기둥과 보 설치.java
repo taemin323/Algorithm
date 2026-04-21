@@ -48,25 +48,30 @@ class Solution {
             }
         }
         
-        int[][] answer = new int[list.size()][3];
-        
-        for(int i = 0; i < list.size(); i++) {
-            answer[i][0] = list.get(i)[0];
-            answer[i][1] = list.get(i)[1];
-            answer[i][2] = list.get(i)[2];
-        }
-        return answer;
+        return list.stream().toArray(int[][]::new);
     }
     
     boolean isValid(int n) {
         for(int i = 0; i <= n; i++) {
             for(int j = 0; j <= n; j++) {
+                
+                // 기둥 관련 규칙 체크
                 if(h[i][j]) {
-                    if(!(i == 0 || w[i][j] || (j > 0 && w[i][j-1]) || (i > 0 && h[i-1][j]))) return false;
+                    if(!(i == 0 ||// 바닥 위에 있거나
+                         w[i][j] ||// 보의 왼쪽 끝 부분 위에 있거나
+                         (j > 0 && w[i][j-1]) || // 보의 오른쪽 끝 부분 위에 있거나
+                         (i > 0 && h[i-1][j]))) {// 다른 기둥 위에 있거나
+                        return false;
+                    }
                 } 
                 
+                // 보 관련 규칙 체크
                 if(w[i][j]) {
-                    if(!((i > 0 && h[i-1][j]) || (i > 0 && j < n && h[i-1][j+1]) || (j > 0 && j < n && w[i][j-1] && w[i][j+1]))) return false;
+                    if(!((i > 0 && h[i-1][j]) ||//보의 왼쪽 끝 부분이 기둥 위에 있거나
+                         (i > 0 && j < n && h[i-1][j+1]) ||// 보의 오른쪽 끝 부분이 기둥 위에 있거나
+                         (j > 0 && j < n && w[i][j-1] && w[i][j+1]))) {// 양쪽 끝 부분이 다른 보와 연결되어 있거나
+                        return false;
+                    }
                 }
             }
         }
