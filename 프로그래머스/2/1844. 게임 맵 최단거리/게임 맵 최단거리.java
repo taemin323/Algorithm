@@ -3,20 +3,18 @@ import java.util.*;
 class Solution {
     int[] dr = {-1,1,0,0};
     int[] dc = {0,0,-1,1};
-    int n;
-    int m;
     
     public int solution(int[][] maps) {
-        n = maps.length;
-        m = maps[0].length;
+        int answer = -1;
         
-        return bfs(0,0,maps);
-    }
-    
-    int bfs(int r, int c, int[][] maps) {
+        int n = maps.length;
+        int m = maps[0].length;
+        
+        boolean[][] visited = new boolean[n][m];
+        
         Queue<int[]> q = new LinkedList<>();
-        q.offer(new int[] {r, c , 1});
-        maps[r][c] = 0;
+        q.offer(new int[] {0,0,0});
+        visited[0][0] = true;
         
         while(!q.isEmpty()) {
             int[] cur = q.poll();
@@ -24,7 +22,9 @@ class Solution {
             int curC = cur[1];
             int curDist = cur[2];
             
-            if(curR == n-1 && curC == m-1) return curDist;
+            if(curR == n-1 && curC == m-1) {
+                answer = curDist+1;
+            }
             
             for(int d = 0; d < 4; d++) {
                 int nr = curR + dr[d];
@@ -32,12 +32,12 @@ class Solution {
                 
                 if(nr < 0 || nr >= n || nc < 0 || nc >= m) continue;
                 
-                if(maps[nr][nc] == 1) {
-                    maps[nr][nc] = 0;
+                if(!visited[nr][nc] && maps[nr][nc] == 1) {
+                    visited[nr][nc] = true;
                     q.offer(new int[] {nr, nc, curDist+1});
                 }
             }
         }
-        return -1;
+        return answer;
     }
 }
