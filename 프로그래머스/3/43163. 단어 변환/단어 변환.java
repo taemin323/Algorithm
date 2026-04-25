@@ -1,14 +1,13 @@
 import java.util.*;
-/**
-* 가장 짧은 변환 과정 -> BFS
-*/
 
 class Solution {
     public int solution(String begin, String target, String[] words) {
+        if(!isIn(target, words)) {
+            return 0;
+        }
+        
         int answer = 0;
         boolean[] visited = new boolean[words.length];
-        
-        if(!isWords(target, words)) return 0;
         
         Queue<String> q = new LinkedList<>();
         q.offer(begin);
@@ -17,7 +16,7 @@ class Solution {
             int qSize = q.size();
             for(int k = 0; k < qSize; k++) {
                 String cur = q.poll();
-                
+            
                 if(cur.equals(target)) return answer;
                 
                 for(int i = 0; i < words.length; i++) {
@@ -29,15 +28,7 @@ class Solution {
             }
             answer++;
         }
-        
         return answer;
-    }
-    
-    boolean isWords(String target, String[] words) {
-        for(String word : words) {
-            if(target.equals(word)) return true;
-        }
-        return false;
     }
     
     boolean isDiff(String word1, String word2) {
@@ -48,5 +39,12 @@ class Solution {
         }
         
         return cnt == 1;
+    }
+    
+    boolean isIn(String target, String[] words){
+        for(String word : words){
+            if(word.equals(target)) return true;
+        }
+        return false;
     }
 }
