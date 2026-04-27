@@ -1,42 +1,38 @@
 import java.util.*;
 
 class Solution {
+    List<String> list = new ArrayList<>();
     boolean[] visited;
-    String[] answer;
     boolean flag;
     
     public String[] solution(String[][] tickets) {
-        Arrays.sort(tickets, (a,b) -> {
-            return a[1].compareTo(b[1]);
-        });
-        
         visited = new boolean[tickets.length];
-        String[] path = new String[tickets.length+1];
-        path[0] = "ICN";
         
-        dfs("ICN", tickets, path, 0);
+        Arrays.sort(tickets, (a,b) -> a[1].compareTo(b[1]));
         
-        
-        return answer;
+        list.add("ICN");
+        dfs(0, "ICN", tickets);
+        return list.stream().toArray(String[]::new);
     }
     
-    void dfs(String cur, String[][] tickets, String[] path, int depth) {
+    void dfs(int depth, String str, String[][] tickets) {
         if(flag) return;
         
         if(depth == tickets.length) {
-            answer = path.clone();
             flag = true;
             return;
         }
         
         for(int i = 0; i < tickets.length; i++) {
-            if(!visited[i] && tickets[i][0].equals(cur)) {
+            if(!visited[i] && tickets[i][0].equals(str)) {
                 visited[i] = true;
-                path[depth+1] = tickets[i][1];
+                list.add(tickets[i][1]);
+                dfs(depth+1, tickets[i][1], tickets);
                 
-                dfs(tickets[i][1], tickets, path, depth+1);
+                if(flag) return;
                 visited[i] = false;
+                list.remove(list.size()-1);
             }
         }
-    }
+    }    
 }
