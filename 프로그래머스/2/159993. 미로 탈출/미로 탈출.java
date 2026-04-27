@@ -1,29 +1,26 @@
 import java.util.*;
 
 class Solution {
+    boolean[][] visited;
     int[] dr = {-1,1,0,0};
     int[] dc = {0,0,-1,1};
-    int n;
-    int m;
-    boolean[][] visited;
-    
-    int spotR;
-    int spotC;
-    int answer = 0;
+    int answer = -1;
+    int cnt = 0;
     boolean flag;
+    
     public int solution(String[] maps) {
-        n = maps.length;
-        m = maps[0].length();
-        
-        visited = new boolean[n][m];
         
         int startR = 0;
         int startC = 0;
+        int spotR = 0;
+        int spotC = 0;
         int endR = 0;
         int endC = 0;
         
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
+        visited = new boolean[maps.length][maps[0].length()];
+        
+        for(int i = 0; i < maps.length; i++) {
+            for(int j = 0; j < maps[0].length(); j++) {
                 if(maps[i].charAt(j) == 'S') {
                     startR = i;
                     startC = j;
@@ -36,22 +33,24 @@ class Solution {
                 }
             }
         }
-        bfs(startR, startC, spotR, spotC, maps);
-        if(!flag) return -1;
         
-        visited = new boolean[n][m];
-        flag = false;
-        bfs(spotR, spotC, endR, endC, maps);
-        if(!flag) return -1;
+        bfs(startR, startC, spotR, spotC, maps);
+        visited = new boolean[maps.length][maps[0].length()];
+        
+        if(flag) {
+            flag = false;
+            bfs(spotR, spotC, endR, endC, maps);
+        }
+        
+        if(flag) answer = cnt;
+        
         return answer;
     }
     
-    void bfs(int startR, int startC, int spotR, int spotC, String[] maps) {
+    void bfs(int sr, int sc, int er, int ec, String[] maps) {
         Queue<int[]> q = new LinkedList<>();
-        q.offer(new int[] {startR, startC, 0});
-        visited[startR][startC] = true;
-        
-        boolean flag2 = false;
+        q.offer(new int[] {sr, sc, 0});
+        visited[sr][sc] = true;
         
         while(!q.isEmpty()) {
             int[] cur = q.poll();
@@ -59,27 +58,25 @@ class Solution {
             int curC = cur[1];
             int curDist = cur[2];
             
-            if(curR == spotR && curC == spotC) {
-                answer += curDist;
-                flag2 = true;
-                break;
+            if(curR == er && curC == ec) {
+                flag = true;
+                cnt += curDist;
+                return;
             }
             
             for(int d = 0; d < 4; d++) {
                 int nr = curR + dr[d];
                 int nc = curC + dc[d];
                 
-                if(nr < 0 || nr >= n || nc < 0 || nc >= m) continue;
+                if(nr < 0 || nr >= maps.length || nc < 0 || nc >= maps[0].length()) continue;
                 
+                if(visited[nr][nc]) continue;
                 
-                if(!visited[nr][nc] && maps[nr].charAt(nc) != 'X') {
+                if(maps[nr].charAt(nc) != 'X') {
                     visited[nr][nc] = true;
-                    q.offer(new int[] {nr, nc, curDist+1});
+                    q.offer(new int[]{nr, nc, curDist+1});
                 }
             }
-            
         }
-        flag = flag2;
-        
     }
 }
