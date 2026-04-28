@@ -1,32 +1,28 @@
 import java.util.*;
 
 class Solution {
+    int[][] memo;
+    
     public int solution(int[][] triangle) {
-        int[][] dp = triangle;
-        int answer = Integer.MIN_VALUE;
+        int n = triangle.length;
         
-        dp[1][0] = triangle[0][0] + triangle[1][0];
-        dp[1][1] = triangle[0][0] + triangle[1][1];
+        memo = new int[n][n];
+        for(int[] row : memo) Arrays.fill(row, -1);
         
-        // dp[i][j] : i줄 j번째까지의 누적합
-        for(int i = 2; i < triangle.length; i++) {
-            dp[i][0] = dp[i-1][0] + triangle[i][0];
-            dp[i][triangle[i].length-1] = dp[i-1][triangle[i-1].length-1] + triangle[i][triangle[i].length-1];
+        return dfs(0,0,triangle);
+    }
+    
+    int dfs(int r, int c, int[][] triangle) {
+        if(r == triangle.length-1) {
+            return triangle[r][c];
         }
         
-        for(int i = 2; i < triangle.length; i++) {
-            for(int j = 1; j < triangle[i].length; j++) {
-                if(j > 0 && j < triangle[i].length-1) {
-                    dp[i][j] = Math.max(dp[i-1][j-1], dp[i-1][j]) + triangle[i][j];
-                }            
-            }
+        if(memo[r][c] != -1) {
+            return memo[r][c];
         }
         
-        
-        for(int i = 0; i < dp[dp.length-1].length; i++) {
-            answer = Math.max(answer, dp[dp.length-1][i]);
-        }
-
-        return answer;
+        memo[r][c] = triangle[r][c] + Math.max(dfs(r+1, c, triangle), dfs(r+1, c+1, triangle));
+    
+        return memo[r][c];    
     }
 }
