@@ -2,49 +2,46 @@ import java.util.*;
 
 class Solution {
     boolean[][] visited;
+    boolean flag;
     int[] dr = {-1,1,0,0};
     int[] dc = {0,0,-1,1};
-    int answer = -1;
-    int cnt = 0;
-    boolean flag;
+    int answer = 0;
     
     public int solution(String[] maps) {
         
-        int startR = 0;
-        int startC = 0;
-        int spotR = 0;
-        int spotC = 0;
-        int endR = 0;
-        int endC = 0;
+        int sr = 0;
+        int sc = 0;
+        int er = 0;
+        int ec = 0;
+        int lr = 0;
+        int lc = 0;
         
         visited = new boolean[maps.length][maps[0].length()];
-        
+
         for(int i = 0; i < maps.length; i++) {
             for(int j = 0; j < maps[0].length(); j++) {
                 if(maps[i].charAt(j) == 'S') {
-                    startR = i;
-                    startC = j;
+                    sr = i;
+                    sc = j;
                 } else if(maps[i].charAt(j) == 'L') {
-                    spotR = i;
-                    spotC = j;
+                    lr = i;
+                    lc = j;
                 } else if(maps[i].charAt(j) == 'E') {
-                    endR = i;
-                    endC = j;
+                    er = i;
+                    ec = j;
                 }
             }
         }
         
-        bfs(startR, startC, spotR, spotC, maps);
+        bfs(sr, sc, lr, lc, maps);
+        if(!flag) return -1;
         visited = new boolean[maps.length][maps[0].length()];
+        flag = false;
         
-        if(flag) {
-            flag = false;
-            bfs(spotR, spotC, endR, endC, maps);
-        }
-        
-        if(flag) answer = cnt;
-        
+        bfs(lr, lc, er, ec, maps);
+        if(!flag) return -1;
         return answer;
+        
     }
     
     void bfs(int sr, int sc, int er, int ec, String[] maps) {
@@ -60,8 +57,7 @@ class Solution {
             
             if(curR == er && curC == ec) {
                 flag = true;
-                cnt += curDist;
-                return;
+                answer += curDist;
             }
             
             for(int d = 0; d < 4; d++) {
@@ -70,13 +66,11 @@ class Solution {
                 
                 if(nr < 0 || nr >= maps.length || nc < 0 || nc >= maps[0].length()) continue;
                 
-                if(visited[nr][nc]) continue;
-                
-                if(maps[nr].charAt(nc) != 'X') {
+                if(!visited[nr][nc] && maps[nr].charAt(nc) != 'X') {
                     visited[nr][nc] = true;
-                    q.offer(new int[]{nr, nc, curDist+1});
+                    q.offer(new int[] {nr, nc, curDist+1});
                 }
             }
         }
-    }
+    } 
 }
