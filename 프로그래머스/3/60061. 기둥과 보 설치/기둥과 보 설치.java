@@ -1,7 +1,6 @@
 import java.util.*;
 
 class Solution {
-    
     boolean[][] h;
     boolean[][] w;
     
@@ -12,22 +11,22 @@ class Solution {
         for(int i = 0; i < build_frame.length; i++) {
             int c = build_frame[i][0];
             int r = build_frame[i][1];
-            int type = build_frame[i][2];
-            int work = build_frame[i][3];
+            int type = build_frame[i][2]; //0: 기둥, 1: 보
+            int work = build_frame[i][3]; //0: 삭제, 1: 설치
             
             boolean prev = (type == 0) ? h[r][c] : w[r][c];
             
-            // 일단 설치 혹은 제거
-            if(work == 1){
+            //일단 설치 or 제거 수행
+            if(work == 1) {
                 if(type == 0) {
                     h[r][c] = true;
-                } else{
+                } else {
                     w[r][c] = true;
                 }
             } else {
                 if(type == 0) {
                     h[r][c] = false;
-                } else {
+                } else { 
                     w[r][c] = false;
                 }
             }
@@ -43,39 +42,44 @@ class Solution {
         
         for(int c = 0; c <= n; c++) {
             for(int r = 0; r <= n; r++) {
-                if(h[r][c]) list.add(new int[] {c,r,0});
-                if(w[r][c]) list.add(new int[] {c,r,1});
+                if(h[r][c]) list.add(new int[]{c,r,0});
+                if(w[r][c]) list.add(new int[]{c,r,1});
             }
         }
         
-        return list.stream().toArray(int[][]::new);
+        int[][] answer = new int[list.size()][3];
+        for(int i = 0; i < list.size(); i++) {
+            answer[i][0] = list.get(i)[0];
+            answer[i][1] = list.get(i)[1];
+            answer[i][2] = list.get(i)[2];
+        }
+        return answer;
     }
     
     boolean isValid(int n) {
         for(int i = 0; i <= n; i++) {
             for(int j = 0; j <= n; j++) {
-                
-                // 기둥 관련 규칙 체크
+                //기둥 관련 체크
                 if(h[i][j]) {
-                    if(!(i == 0 ||// 바닥 위에 있거나
-                         w[i][j] ||// 보의 왼쪽 끝 부분 위에 있거나
-                         (j > 0 && w[i][j-1]) || // 보의 오른쪽 끝 부분 위에 있거나
-                         (i > 0 && h[i-1][j]))) {// 다른 기둥 위에 있거나
+                    if(!(i == 0 ||
+                        w[i][j] ||
+                        (j > 0 && w[i][j-1]) ||
+                        (i > 0 && h[i-1][j]))) {
                         return false;
                     }
-                } 
+                }
                 
-                // 보 관련 규칙 체크
+                
+                //보 관련 체크
                 if(w[i][j]) {
-                    if(!((i > 0 && h[i-1][j]) ||//보의 왼쪽 끝 부분이 기둥 위에 있거나
-                         (i > 0 && j < n && h[i-1][j+1]) ||// 보의 오른쪽 끝 부분이 기둥 위에 있거나
-                         (j > 0 && j < n && w[i][j-1] && w[i][j+1]))) {// 양쪽 끝 부분이 다른 보와 연결되어 있거나
+                    if(!((i > 0 && h[i-1][j]) ||
+                        (i > 0 && j < n && h[i-1][j+1]) ||
+                        (j > 0 && j < n && w[i][j-1] && w[i][j+1]))) {
                         return false;
                     }
                 }
             }
         }
-        
         return true;
     }
 }
