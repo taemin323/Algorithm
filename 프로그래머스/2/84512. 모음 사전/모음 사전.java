@@ -1,26 +1,36 @@
 import java.util.*;
 
 class Solution {
+    StringBuilder sb = new StringBuilder();
     int answer = 0;
-    List<String> list = new ArrayList<>();
+    int cnt = 0;
+    boolean flag = false;
+    
     public int solution(String word) {
-        dfs("", 0);
         
-        for(int i = 0; i < list.size(); i++) {
-            if(list.get(i).equals(word)) answer = i;
-        }
+        dfs(0, word);
+        
         
         return answer;
     }
     
-    void dfs(String str, int depth) { 
+    void dfs(int len, String target) {
+        if(len > 5 || flag) return;
         
-        list.add(str);
-        
-        if(depth == 5) return;
+        if(len > 0) {
+            cnt++;
+            
+            if(sb.toString().equals(target)) {
+                answer = cnt;
+                flag = true;
+                return;
+            }
+        }
         
         for(int i = 0; i < 5; i++) {
-            dfs(str + "AEIOU".charAt(i), depth+1);
+            sb.append("AEIOU".charAt(i));
+            dfs(len+1, target);
+            sb.deleteCharAt(sb.length()-1);
         }
     }
 }
