@@ -1,31 +1,26 @@
 import java.util.*;
-/**
-* numbers로 만들 수 있는 모든 숫자를 set에 저장
-* prev 문자열에 현재 문자를 더하고 numbers에서는 그 문자를 뺀걸 넘김
-* 만들어진 set에서 소수인 것들만 카운트
+/*
+* 방식은 똑같이 set에 만들 수 있는 모든 숫자 저장.
+* 소수 판별 메서드 만들어서 set에 있는 숫자들 모두 검사
 */
 
 class Solution {
     Set<Integer> set = new HashSet<>();
+    boolean[] visited;
     
     public int solution(String numbers) {
         int answer = 0;
         
-        perm("", numbers);
+        visited = new boolean[numbers.length()];
+        StringBuilder sb = new StringBuilder();
+        
+        perm(sb, numbers);
         
         for(int s : set) {
-            if(isPrime(s)) answer++;//소수라면 answer에 추가
+            if(isPrime(s)) answer++;
         }
         
         return answer;
-    }
-    
-    void perm(String prev, String numbers) {
-        if(!prev.equals("")) set.add(Integer.valueOf(prev));//만들어진 숫자 set에 저장
-        
-        for(int i = 0; i < numbers.length(); i++) {
-            perm(prev+numbers.charAt(i), numbers.substring(0, i) + numbers.substring(i+1, numbers.length()));
-        }
     }
     
     boolean isPrime(int n) {
@@ -35,5 +30,21 @@ class Solution {
             if(n % i == 0) return false;
         }
         return true;
+    }
+    
+    void perm(StringBuilder sb, String numbers) {
+        
+        if(sb.length() > 0) set.add(Integer.parseInt(sb.toString()));
+        
+        for(int i = 0; i < numbers.length(); i++) {
+            if(visited[i]) continue;
+            
+            //아직 방문하지 않았다면
+            visited[i] = true;
+            perm(sb.append(numbers.charAt(i)), numbers);
+            //백트래킹
+            sb.deleteCharAt(sb.length()-1);
+            visited[i] = false;
+        }
     }
 }
