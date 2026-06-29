@@ -1,51 +1,132 @@
 import java.util.*;
 /**
-* 빈 공간의 칸 수가 일치한다면 해당 퍼즐 조각 회전 시작.
-* 회전하여 빈 공간과 일치한다면 방문 처리 후 정답 카운트 증가
-* 회전하면서 빈 공간과 일치하는지 체크하는 메서드가 관건
-* 빈 공간의 좌표, 퍼즐의 좌표 모두 정규화 한 다음에 회전 및 비교가 가능
+* 일단 빈칸들과, 블록들 bfs로 각가 리스트에 저장하기
+* 저장할 때 정규화해서 저장해야 나중에 비교할 수 있음
+* 빈칸과 블록를 비교할 때는 총 4번을 비교해야함. 회전시켜서 비교해야 되니까
 */
 
 class Solution {
-    List<List<int[]>> blanks = new ArrayList<>();
-    List<List<int[]>> puzzles = new ArrayList<>();
-    int n;
     int[] dr = {-1,1,0,0};
     int[] dc = {0,0,-1,1};
+    boolean[][] visited;
+    int n;
     
     public int solution(int[][] game_board, int[][] table) {
         n = game_board.length;
-        boolean[][] visited = new boolean[n][n];
         
+        List<List<int[]>> spaces = new ArrayList<>();
+        List<List<int[]>> blocks = new ArrayList<>();
+        
+        visited = new boolean[n][n];
+        
+        //빈칸들 저장
         for(int i = 0; i < n; i++) {
             for(int j = 0; j < n; j++) {
-                if(!visited[i][j] && game_board[i][j] == 0) blanks.add(bfs(i, j, game_board, visited, 0));
+                if(!visited[i][j] && game_board[i][j] == 0) {
+                    visited[i][j] = true;
+                    spaces.add(bfs(i, j, game_board, 0));
+                }
             }
         }
         
         visited = new boolean[n][n];
+        //블록들 저장
         for(int i = 0; i < n; i++) {
             for(int j = 0; j < n; j++) {
-                if(!visited[i][j] && table[i][j] == 1) puzzles.add(bfs(i, j, table, visited, 1));
+                if(!visited[i][j] && table[i][j] == 1) {
+                    visited[i][j] = true;
+                    blocks.add(bfs(i, j, table, 1));
+                }
             }
         }
         
-        return match(blanks, puzzles);
+        
+        return match(spaces, blocks);
     }
     
-    //빈 칸이랑 퍼즈들 각각 저장하기 위한 bfs
-    List<int[]> bfs(int r, int c, int[][] board, boolean[][] visited, int target) {
+    //빈칸과 블록을 매칭시켜 정답 도출하는 메서드
+    int match(List<List<int[]>> spaces, List<List<int[]>> blocks) {
+        int cnt = 0;
+        
+        boolean[] sUsed = new boolean[spaces.size()];
+        boolean[] bUsed = new boolean[blocks.size()];
+        
+        for(int j = 0; j < spaces.size(); j++) {
+            List<int[]> space = spaces.get(j);
+            
+            for(int i = 0; i < blocks.size(); i++) {
+                List<int[]> block = blocks.get(i);
+                
+                if(!sUsed[j] && !bUsed[i] && rotateAndCompare(space, block)) {
+                    bUsed[i] = true;
+                    sUsed[j] = true;
+                    cnt += block.size();
+                    break;
+                }
+            }
+        }
+        
+        return cnt;
+    }
+    
+    //빈칸과 블록 비교 : 회전한 버전 4개 모두와 비교
+    boolean rotateAndCompare(List<int[]> space, List<int[]> block) {
+        //칸 개수가 다르면 맞는 블록이 아님
+        if(space.size() != block.size()) return false;
+        
+        //블록을 회전시켜 보면서 빈칸에 넣어보기
+        List<int[]> rotate = block;
+        for(int i = 0; i < 4; i++) {
+            if(compare(space, rotate)) return true;
+            
+            if(i < 3) {
+                rotate = rotated(rotate);              
+            }
+        }
+        
+        return false;
+    }
+    
+    //진짜 1:1 비교
+    boolean compare(List<int[]> space, List<int[]> block) {
+        Collections.sort(space, (a,b) -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]);
+        Collections.sort(block, (a,b) -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]);
+        
+        for(int i = 0; i < space.size(); i++) {
+            int[] s = space.get(i);
+            int[] b = block.get(i);
+            
+            if(s[0] != b[0] || s[1] != b[1]) return false;
+        }
+        return true;
+    }
+    
+    //회전 메서드
+    List<int[]> rotated(List<int[]> block) {
         List<int[]> result = new ArrayList<>();
         
+        for(int[] b : block) {
+            int r = b[1];
+            int c = -b[0];
+            
+            result.add(new int[] {r, c});
+        }
+        
+        //여기서도 정규화
+        return calculate(result);
+    }
+    
+    // 빈칸/블록 저장 메서드
+    List<int[]> bfs(int i, int j, int[][] board, int target) {
+        List<int[]> result = new ArrayList<>();
         Queue<int[]> q = new LinkedList<>();
-        q.add(new int[] {r, c});
-        visited[r][c] = true;
+        q.add(new int[] {i, j});
+        result.add(new int[] {i, j});
         
         while(!q.isEmpty()) {
             int[] cur = q.poll();
             int curR = cur[0];
             int curC = cur[1];
-            result.add(new int[] {curR, curC});
             
             for(int d = 0; d < 4; d++) {
                 int nr = curR + dr[d];
@@ -56,6 +137,7 @@ class Solution {
                 if(!visited[nr][nc] && board[nr][nc] == target) {
                     visited[nr][nc] = true;
                     q.add(new int[] {nr, nc});
+                    result.add(new int[] {nr, nc});
                 }
             }
         }
@@ -63,101 +145,21 @@ class Solution {
         return calculate(result);
     }
     
-    //정규화 메서드 - 퍼즐과 빈 칸을 비교하기 위해
+    //정규화 메서드
     List<int[]> calculate(List<int[]> list) {
         int minR = Integer.MAX_VALUE;
         int minC = Integer.MAX_VALUE;
         
-        for(int[] l : list) {
-            minR = Math.min(minR, l[0]);
-            minC = Math.min(minC, l[1]);
+        for(int[] i : list) {
+            minR = Math.min(minR, i[0]);
+            minC = Math.min(minC, i[1]);
         }
         
-        for(int[] l : list) {
-            l[0] -= minR;
-            l[1] -= minC;
-        }
-        return list;
-    }
-    
-    // 빈 칸과 퍼즐 매칭 메서드
-    int match(List<List<int[]>> blanks, List<List<int[]>> puzzles) {
-        int result = 0;
-        boolean[] visited = new boolean[puzzles.size()];
-        
-        for(int i = 0; i < blanks.size(); i++) {
-            List<int[]> blank = blanks.get(i);
-            
-            for(int j = 0; j < puzzles.size(); j++) {
-                List<int[]> puzzle = puzzles.get(j);
-                
-                if(visited[j]) continue;
-                
-                if(rotateAndCompare(blank, puzzle)) {
-                    result += puzzle.size();
-                    visited[j] = true;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-    
-    // 회전시켜서 비교하는 메서드
-    boolean rotateAndCompare(List<int[]> blank, List<int[]> puzzle) {
-        //길이가 다르면 애초에 다름
-        if(blank.size() != puzzle.size()) return false;
-        
-        //회전시켰을 때 4개의 모양을 blank와 비교
-        List<int[]> rotate = puzzle;
-        for(int i = 0; i < 4; i++) {
-            if(compare(blank, rotate)) return true;
-            
-            if(i < 3) {
-                rotate = rotated(rotate);
-            }
-        }
-        return false;
-    }
-    
-    // 비교 메서드
-    boolean compare(List<int[]> blank, List<int[]> rotate) {
-        Collections.sort(blank, (a,b) -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]);
-        Collections.sort(rotate, (a,b) -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]);
-        
-        for(int i = 0; i < blank.size(); i++) {
-            int[] b = blank.get(i);
-            int[] r = rotate.get(i);
-            
-            if(b[0] != r[0] || b[1] != r[1]) return false;
-        }
-        
-        return true;
-    }
-    
-    // 회전 메서드
-    List<int[]> rotated(List<int[]> puzzle) {
-        List<int[]> result = new ArrayList<>();
-        
-        int minR = Integer.MAX_VALUE;
-        int minC = Integer.MAX_VALUE;
-        
-        for(int[] p : puzzle) {
-            int r = p[1];
-            int c = -p[0];
-            
-            result.add(new int[] {r, c});
-            
-            if(r < minR) minR = r;
-            if(c < minC) minC = c;
-        }
-        
-        //정규화
-        for(int[] i : result) {
+        for(int[] i : list) {
             i[0] -= minR;
             i[1] -= minC;
         }
         
-        return result;
+        return list;
     }
 }
