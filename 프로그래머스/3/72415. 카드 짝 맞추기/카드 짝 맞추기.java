@@ -1,30 +1,43 @@
 import java.util.*;
 
 class Solution {
-    int answer = Integer.MAX_VALUE;
+    //어떤 카드부터 제거할지 정하는지에 따라 키 조작 횟수 달라지니 모든 경우의 수를 구해서 비교해야함
     List<List<Integer>> orders = new ArrayList<>();
+    int answer = Integer.MAX_VALUE;
     int[] dr = {-1,1,0,0};
     int[] dc = {0,0,-1,1};
     
     public int solution(int[][] board, int r, int c) {
         List<Integer> cardTypes = new ArrayList<>();
-        for(int i = 0; i < board.length; i++) {
-            for(int j = 0; j < board[0].length; j++) {
+        for(int i = 0; i < 4; i++) {
+            for(int j = 0; j < 4; j++) {
                 if(board[i][j] != 0 && !cardTypes.contains(board[i][j])) cardTypes.add(board[i][j]);
             }
         }
-        
-        perm(cardTypes, new boolean[cardTypes.size()], new ArrayList<>());
+
+        //그러니 일단 나올 수 있는 카드의 순서를 모두 저장
+        perm(cardTypes, new ArrayList<>(), new boolean[cardTypes.size()]);
         
         for(List<Integer> order : orders) {
-            int result = calculate(copyBoard(board), order, 0, r, c);
-            answer = Math.min(answer, result);
+            int result = calculate(copyBoard(board), order, r, c, 0);
+            answer = Math.min(result, answer);
         }
         
         return answer;
     }
     
-    void perm(List<Integer> cardTypes, boolean[] visited, List<Integer> cur) {
+    //원본 board 훼손 안시키려고
+    int[][] copyBoard(int[][] board) {
+        int[][] result = new int[board.length][board[0].length];
+        
+        for(int i = 0; i < board.length; i++) {
+            result[i] = board[i].clone(); 
+        }
+        return result;
+    }
+    
+    //카드의 순서 정해주는 메서드
+    void perm(List<Integer> cardTypes, List<Integer> cur, boolean[] visited) {
         if(cur.size() == cardTypes.size()) {
             orders.add(new ArrayList<>(cur));
             return;
@@ -34,127 +47,119 @@ class Solution {
             if(!visited[i]) {
                 visited[i] = true;
                 cur.add(cardTypes.get(i));
-                perm(cardTypes, visited, cur);
-                cur.remove(cur.size()-1);
+                perm(cardTypes, cur, visited);
+                cur.remove(cur.size() - 1);
                 visited[i] = false;
             }
         }
     }
     
-    int calculate(int[][] board, List<Integer> order, int depth, int r, int c) {
+    // 각 순서의 최종 키 조작 횟수 계산 메서드
+    int calculate(int[][] board, List<Integer> order, int r, int c, int depth) {
         if(depth == order.size()) {
             return 0;
         }
         
-        int cardNum = order.get(depth);
-        
-        //현재 지워야할 숫자 카드 2개의 위치
-        List<int[]> pos = getPos(board, cardNum);
+        //현재 카드의 위치를 알아야됨.
+        List<int[]> pos = getPos(order.get(depth), board);
         int[] p1 = pos.get(0);
         int[] p2 = pos.get(1);
         
-        // 현재 위치 -> p1 -> p2
-        int move1 = bfs(board, r, c, p1[0], p1[1]) + bfs(board, p1[0], p1[1], p2[0], p2[1]) + 2;
+        //현재 위치 -> p1 -> p2일 때 키 조작 횟수 / +2는 엔터 누른것.
+        int cnt1 = bfs(board, r, c, p1[0], p1[1]) + bfs(board, p1[0], p1[1], p2[0], p2[1]) + 2;
         
+        //현재 위치 -> p2 -> p1일 때 키 조작 횟수
+        int cnt2 = bfs(board, r, c, p2[0], p2[1]) + bfs(board, p2[0], p2[1], p1[0], p1[1]) + 2;
         
-        // 현재 위치 -> p2 -> p1
-        int move2 = bfs(board, r, c, p2[0], p2[1]) + bfs(board, p2[0], p2[1], p1[0], p1[1]) + 2;
-        
-        // 다음 단계를 위해 보드에서 현재 카드 번호 지움
+        //다음 단계를 위해 현재 카드 지움
         board[p1[0]][p1[1]] = 0;
         board[p2[0]][p2[1]] = 0;
         
-        // 다른 숫자 카드들도 지우기 위해 재귀 호출
-        int res1 = move1 + calculate(board, order, depth+1, p2[0], p2[1]);
-        int res2 = move2 + calculate(board, order, depth+1, p1[0], p1[1]);
+        //다른 숫자 카드들도 뒤집기 위해 재귀
+        int result1 = cnt1 + calculate(board, order, p2[0], p2[1], depth+1);
+        int result2 = cnt2 + calculate(board, order, p1[0], p1[1], depth+1);
         
         //백트래킹
-        board[p1[0]][p1[1]] = cardNum;
-        board[p2[0]][p2[1]] = cardNum;
+        board[p1[0]][p1[1]] = order.get(depth);
+        board[p2[0]][p2[1]] = order.get(depth);
         
-        return Math.min(res1, res2);
+        return Math.min(result1, result2);
     }
     
-    int[][] copyBoard(int[][] board) {
-        int[][] result = new int[4][4];
-        for(int i = 0; i < 4; i++) {
-            result[i] = board[i].clone();
-        }
-        return result;
-    }
-    
-    List<int[]> getPos(int[][] board, int cardNum) {
+    //카드 위치 찾는 메서드
+    List<int[]> getPos(int cardNum, int[][] board) {
         List<int[]> result = new ArrayList<>();
         
         for(int i = 0; i < board.length; i++) {
             for(int j = 0; j < board[0].length; j++) {
-                if(board[i][j] == cardNum) {
-                    result.add(new int[] {i, j});
-                }
+                if(board[i][j] == cardNum) result.add(new int[] {i, j});
             }
         }
-        
         return result;
     }
     
-    int bfs(int[][] board, int startR, int startC, int targetR, int targetC) {
+    //bfs
+    int bfs(int[][] board, int sr , int sc, int er, int ec) {
         //커서가 이미 카드 위에 있는 경우
-        if(startR == targetR && startC == targetC) return 0;
+        if(sr == er && sc == ec) return 0;
         
         boolean[][] visited = new boolean[board.length][board[0].length];
         Queue<int[]> q = new LinkedList<>();
-        q.offer(new int[] {startR, startC, 0});
-        visited[startR][startC] = true;
+        q.add(new int[] {sr, sc, 0});
+        visited[sr][sc] = true;
         
         while(!q.isEmpty()) {
             int[] cur = q.poll();
             int curR = cur[0];
             int curC = cur[1];
-            int curDist = cur[2];
+            int curCnt = cur[2];
             
-            if(curR == targetR && curC == targetC) return curDist;
+            if(curR == er && curC == ec) return curCnt;
             
             for(int d = 0; d < 4; d++) {
-                // 일반 이동
+                //일반 이동
                 int nr = curR + dr[d];
                 int nc = curC + dc[d];
                 
-                if(nr >= 0 && nr < 4 && nc >= 0 && nc < 4 && !visited[nr][nc]) {
+                if(nr < 0 || nr >= board.length || nc < 0 || nc >= board[0].length) continue;
+                
+                if(!visited[nr][nc]) {
                     visited[nr][nc] = true;
-                    q.offer(new int[] {nr, nc, curDist+1});
+                    q.add(new int[] {nr, nc, curCnt+1});
                 }
                 
-                // ctrl+방향키 이동
+                //ctrl 이동
                 int[] ctrl = getCtrl(board, curR, curC, dr[d], dc[d]);
                 int cr = ctrl[0];
                 int cc = ctrl[1];
                 
                 if(!visited[cr][cc]) {
                     visited[cr][cc] = true;
-                    q.offer(new int[] {cr, cc, curDist + 1});
+                    q.add(new int[] {cr, cc, curCnt+1});
                 }
             }
         }
         return 0;
     }
     
-    int[] getCtrl(int[][] board, int r, int c, int di, int dj) {
-        int nr = r;
-        int nc = c;
+    int[] getCtrl(int[][] board, int curR, int curC, int di, int dj) {
+        int nr = curR;
+        int nc = curC;
         
         while(true) {
             int tr = nr + di;
             int tc = nc + dj;
             
-            //격자 범위를 벗어나면 현재 위치가 최종 목적지
-            if(tr < 0 || tr >= 4 || tc < 0 || tc >= 4) break;
+            //board를 벗어나면 현재 위치가 결국 최종 목적지
+            if(tr < 0 || tr >= board.length || tc < 0 || tc >= board[0].length) break;
             
             nr = tr;
             nc = tc;
             
-            // 이동 중 카드를 만나면 그 자리에서 멈춤
-            if(board[nr][nc] != 0) break;
+            //다른 카드를 마주쳤다면 여기가 최종 목적지
+            if(board[tr][tc] != 0) break;
         }
-        return new int[]{nr, nc};
+        return new int[] {nr, nc};
     }
+    
 }
