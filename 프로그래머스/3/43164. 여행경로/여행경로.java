@@ -1,40 +1,36 @@
 import java.util.*;
 
 class Solution {
+    List<String> list = new ArrayList<>();
     boolean[] visited;
-    Stack<String> stack = new Stack<>();
     boolean flag;
     
     public String[] solution(String[][] tickets) {
-        String[] answer = new String[tickets.length+1];
         visited = new boolean[tickets.length];
-        stack.push("ICN");
+        list.add("ICN");
         
-        //사전순 정렬
         Arrays.sort(tickets, (a,b) -> a[1].compareTo(b[1]));
         
         dfs("ICN", tickets, 0);
-        return stack.stream().toArray(String[]::new);
+        
+        return list.toArray(new String[0]);
     }
     
     void dfs(String cur, String[][] tickets, int depth) {
-        if(flag) return;
-        
         if(depth == tickets.length) {
             flag = true;
             return;
         }
         
-        
         for(int i = 0; i < tickets.length; i++) {
             if(!visited[i] && tickets[i][0].equals(cur)) {
                 visited[i] = true;
-                stack.push(tickets[i][1]);
+                list.add(tickets[i][1]);
                 dfs(tickets[i][1], tickets, depth+1);
                 
                 if(flag) return;
                 visited[i] = false;
-                stack.pop();
+                list.remove(list.size()-1);
             }
         }
     }
