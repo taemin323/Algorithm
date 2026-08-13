@@ -1,47 +1,63 @@
 import java.util.*;
+/**
+* 다익스트라는 항상 s로부터 모든 정점까지의 최단거리를 계산
+* s -> t는 같이 가고, t -> a, t -> b는 따로 구하기
+* 즉 s에서 t까지의 최단 거리, a에서 t까지의 최단 거리, b에서 t까지의 최단거리만 구하면 됨.
+* 
+*/
 
 class Solution {
-    private List<int[]>[] graph;
+    List<int[]>[] graph;
+    int answer = Integer.MAX_VALUE;
     
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        // 플로이드 워셜 세팅
-        int[][] dist = new int[n+1][n+1];
-        int INF = 100_000_000;
+        graph = new ArrayList[n+1];
         
         for(int i = 1; i <= n; i++) {
-            Arrays.fill(dist[i], INF);
-            dist[i][i] = 0;
+            graph[i] = new ArrayList<>();
         }
         
-        // 플로이드 워셜 채우기
         for(int i = 0; i < fares.length; i++) {
-            int from = fares[i][0];
-            int to = fares[i][1];
-            int cost = fares[i][2];
+            int from = fares[i][0], to = fares[i][1], cost = fares[i][2];
             
-            dist[from][to] = cost;
-            dist[to][from] = cost;
+            graph[from].add(new int[] {to, cost});
+            graph[to].add(new int[] {from, cost});
         }
         
-        for(int k = 1; k <= n; k++) {
-            for(int i = 1; i <= n; i++) {
-                for(int j = 1; j <= n; j++) {
-                    if(dist[i][j] > dist[i][k] + dist[k][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];    
-                    }
+        int[] distS = dijkstra(n, s);
+        int[] distA = dijkstra(n, a);
+        int[] distB = dijkstra(n, b);
+        
+        for(int t = 1; t <= n; t++) {
+            if(distS[t] == Integer.MAX_VALUE || distA[t] == Integer.MAX_VALUE || distB[t] == Integer.MAX_VALUE) continue;
+            answer = Math.min(answer, distS[t] + distA[t] + distB[t]);
+        }
+        return answer;
+    }
+    
+    int[] dijkstra(int n, int start) {
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start] = 0;
+        
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> a[1] - b[1]);
+        pq.add(new int[] {start, 0});
+        
+        while(!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            int curNode = cur[0];
+            int curCost = cur[1];
+            
+            if(curCost > dist[curNode]) continue;
+            
+            for(int[] next : graph[curNode]) {
+                int newCost = curCost + next[1];
+                if(newCost < dist[next[0]]) {
+                    dist[next[0]] = newCost;
+                    pq.add(new int[] {next[0], newCost});
                 }
             }
         }
-        
-        // 각자 가는 방법 vs 합승 후 각자
-        int answer = Integer.MAX_VALUE;
-        for(int i = 1; i <= n; i++) {
-            // i == s인 경우 처음부터 따로 출발한 것과 같음.
-            int cur = dist[s][i] + dist[i][a] + dist[i][b];
-            
-            answer = Math.min(answer, cur);
-        }
-        
-        return answer;
+        return dist;
     }
 }
