@@ -1,87 +1,41 @@
 import java.util.*;
+/**
+* A가 B를 이이고, B가 C를 이기면 -> A는 C를 이긴다.
+* 나를 제외한 모든 사람(N-1명)과의 승패 관계가 정리된 사람만 순위가 정해질 수 있음.
+*/
 
 class Solution {
-    
-    public class Record {
-        Set<Integer> win; // 내가 이긴 선수들의 번호
-        Set<Integer> lose; // 나에게 이긴 선수들의 번호
-        
-        public Record() {
-            this.win = new HashSet<>();
-            this.lose = new HashSet<>();
-        }
-    }
-    
-    // 내가 이긴 선수들이 또 이긴 선수들까지 모두 찾아서 losers에 저장
-    public Set<Integer> findLoser(Set<Integer> losers, Record[] record, int i) {
-        for (Integer player: record[i].win) {// 내가 직접 이긴 사람들
-            if(!losers.contains(player)) {// 이미 추가된 사람은 제외
-                losers.add(player);
-                findLoser(losers, record, player);// 재귀적으로 그 사람도 확인
-            }
-        }
-        return losers;
-    }
-    
-    // 내가 진 선수들이 또 진 선수들까지 모두 찾아서 losers에 저장
-    public Set<Integer> findWinner(Set<Integer> winners, Record[] record, int i) {
-        for (Integer player: record[i].lose) {// 나에게 직접 이긴 사람들
-            if(!winners.contains(player)) {// 이미 추가된 사람은 제외
-                winners.add(player);
-                findWinner(winners, record, player);// 재귀적으로 그 사람도 확인
-            }
-        }
-        return winners;
-    }
-    
-    // 간접 승패 반영하여 record 업데이트
-    public void update(Record[] record) {
-        for (int i = 1; i < record.length; i++) {
-            // i 선수가 이긴 사람들의 이긴 사람들까지 모두 찾기
-            Set<Integer> losers = new HashSet<>();
-            findLoser(losers, record, i);
-            
-            for (Integer player: losers) {
-                record[i].win.add(player);// i 선수가 그 사람들도 이긴 셈이므로 추가.
-            }
-            
-            // i 선수가 진 사람들의 이긴 사람들까지 모두 찾기
-            Set<Integer> winners = new HashSet<>();
-            findWinner(winners, record, i);
-            
-            for (Integer player: winners) {
-                record[i].lose.add(player);
-            }
-        }
-    }
-    
     public int solution(int n, int[][] results) {
-        int answer = 0;
+        boolean[][] graph = new boolean[n+1][n+1];
         
-        Record[] record = new Record[n+1];
-        
-        for (int i = 1; i <= n; i++) {
-            record[i] = new Record();
-        }
-        
-        // 주어진 경기 결과로 직접적인 승패 관계 설정
-        for (int i = 0; i < results.length; i++) {
+        for(int i = 0; i < results.length; i++) {
             int winner = results[i][0];
             int loser = results[i][1];
             
-            record[winner].win.add(loser);
-            record[loser].lose.add(winner);
+            graph[winner][loser] = true;
         }
         
-        update(record);
-        
-        // 각 선수마다 win + lose == n-1인지 확인
-        for (int i = 1; i <= n; i++) {
-            if (record[i].win.size() + record[i].lose.size() == n-1) {
-                answer++;
+        for(int k = 1; k <= n; k++) {
+            for(int i = 1; i <= n; i++) {
+                for(int j = 1; j <= n; j++) {
+                    //i가 k를 이기고, k가 j를 이겼다면 -> i는 j를 이김
+                    if(graph[i][k] && graph[k][j]) graph[i][j] = true;
+                }
             }
         }
         
+        //정확한 순위를 알 수 있는 선수 측정
+        int answer = 0;
+        for(int i = 1; i <= n; i++) {
+            int cnt = 0;
+            for(int j = 1; j<= n; j++) {
+                //i가 j를 이겼거나, j가 i를 이겼다면(관계 성립)
+                if(graph[i][j] || graph[j][i]) cnt++;
+            }
+            
+            //그리고 관계가 n-1라면 -> 나를 제외한 모든 사람과 관계가 성립된다는 것.
+            if(cnt == n-1) answer++;
+        }
         return answer;
     }
 }
