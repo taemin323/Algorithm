@@ -1,63 +1,43 @@
 import java.util.*;
 /**
-* 다익스트라는 항상 s로부터 모든 정점까지의 최단거리를 계산
-* s -> t는 같이 가고, t -> a, t -> b는 따로 구하기
-* 즉 s에서 t까지의 최단 거리, a에서 t까지의 최단 거리, b에서 t까지의 최단거리만 구하면 됨.
-* 
+* S -> K + K -> A + K -> B
+* 즉 S-> K + A -> K + B -> K하면 됨.
 */
 
 class Solution {
-    List<int[]>[] graph;
-    int answer = Integer.MAX_VALUE;
-    
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        graph = new ArrayList[n+1];
-        
+        int[][] dist = new int[n+1][n+1];
         for(int i = 1; i <= n; i++) {
-            graph[i] = new ArrayList<>();
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
+            dist[i][i] = 0;
         }
         
         for(int i = 0; i < fares.length; i++) {
-            int from = fares[i][0], to = fares[i][1], cost = fares[i][2];
+            int from = fares[i][0];
+            int to = fares[i][1];
+            int cost = fares[i][2];
             
-            graph[from].add(new int[] {to, cost});
-            graph[to].add(new int[] {from, cost});
+            dist[from][to] = Math.min(dist[from][to], cost);
+            dist[to][from] = Math.min(dist[to][from], cost);
         }
         
-        int[] distS = dijkstra(n, s);
-        int[] distA = dijkstra(n, a);
-        int[] distB = dijkstra(n, b);
-        
-        for(int t = 1; t <= n; t++) {
-            if(distS[t] == Integer.MAX_VALUE || distA[t] == Integer.MAX_VALUE || distB[t] == Integer.MAX_VALUE) continue;
-            answer = Math.min(answer, distS[t] + distA[t] + distB[t]);
-        }
-        return answer;
-    }
-    
-    int[] dijkstra(int n, int start) {
-        int[] dist = new int[n+1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[start] = 0;
-        
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> a[1] - b[1]);
-        pq.add(new int[] {start, 0});
-        
-        while(!pq.isEmpty()) {
-            int[] cur = pq.poll();
-            int curNode = cur[0];
-            int curCost = cur[1];
-            
-            if(curCost > dist[curNode]) continue;
-            
-            for(int[] next : graph[curNode]) {
-                int newCost = curCost + next[1];
-                if(newCost < dist[next[0]]) {
-                    dist[next[0]] = newCost;
-                    pq.add(new int[] {next[0], newCost});
+        for(int k = 1; k <= n; k++) {
+            for(int i = 1; i <= n; i++) {
+                for(int j = 1; j <= n; j++) {
+                    if(dist[i][k] == Integer.MAX_VALUE || dist[k][j] == Integer.MAX_VALUE) continue;
+                    
+                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
                 }
             }
         }
-        return dist;
+        
+        int answer = Integer.MAX_VALUE;
+        
+        for(int k = 1; k <= n; k++) {
+            int cur = dist[s][k] + dist[a][k] + dist[b][k];
+            answer = Math.min(answer, cur);
+        }
+        
+        return answer;
     }
 }
