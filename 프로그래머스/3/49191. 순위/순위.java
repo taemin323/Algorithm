@@ -1,53 +1,42 @@
 import java.util.*;
+/**
+* 내가 이긴 선수들한테 진 선수들도 결국 내가 이긴 선수들로 포함이 된다.
+* 플로이드 워셜로 될듯? 
+* record[i][j] : i가 j에게 이겼다는 기록
+*/
 
 class Solution {
     public int solution(int n, int[][] results) {
-        List<Integer>[] winGraph = new ArrayList[n+1];
-        List<Integer>[] loseGraph = new ArrayList[n+1];
+        int answer = 0;
         
-        for(int i = 1; i <= n; i++) {
-            winGraph[i] = new ArrayList<>();
-            loseGraph[i] = new ArrayList<>();
-        }
+        boolean[][] record = new boolean[n+1][n+1];
         
         for(int i = 0; i < results.length; i++) {
             int winner = results[i][0];
             int loser = results[i][1];
-            winGraph[winner].add(loser);
-            loseGraph[loser].add(winner);
+            
+            record[winner][loser] = true;
         }
         
-        int answer = 0;
-        
-        for(int i = 1; i <= n; i++) {
-            int winCnt = bfs(i, winGraph, n);
-            int loseCnt = bfs(i, loseGraph, n);
-            
-            if(winCnt + loseCnt == n-1) answer++;
-        }
-        return answer;
-    }
-    
-    int bfs(int idx, List<Integer>[] graph, int n) {
-        Queue<Integer> q = new LinkedList<>();
-        boolean[] visited = new boolean[n+1];
-        q.add(idx);
-        visited[idx] = true;
-        
-        int cnt = 0;
-        
-        while(!q.isEmpty()) {
-            int cur = q.poll();
-            
-            for(int next : graph[cur]) {
-                if(!visited[next]) {
-                    visited[next] = true;
-                    q.add(next);
-                    cnt++;
+        for(int k = 1; k <= n; k++) {
+            for(int i = 1; i <= n; i++) {
+                for(int j = 1; j <= n; j++) {
+                    if(record[i][k] && record[k][j]) {
+                        record[i][j] = true;
+                    }
                 }
             }
         }
         
-        return cnt;
+        for(int i = 1; i <= n; i++) {
+            int cnt = 0;
+            for(int j = 1; j <= n; j++) {
+                if(record[i][j] || record[j][i]) cnt++;
+            }
+            
+            if(cnt == n-1) answer++;
+        }
+        
+        return answer;        
     }
 }
