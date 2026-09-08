@@ -1,30 +1,38 @@
 import java.util.*;
+/**
+* 25분
+* 범위가 엄청 큼. dp는 안될듯.
+* 이분탐색? -> 뭘 기준으로 이분탐색을 할것이냐? 
+* 시간을 기준으로.
+*/
 
 class Solution {
     public long solution(int n, int[] times) {
-        
         long answer = 0;
+        long max = 0;
+        for(int time : times) {
+            max = Math.max(max, time);
+        }
         
-        long right = (long) Arrays.stream(times).max().getAsInt() * n;
         long left = 1;
-        long mid = 0;
+        long right = (long) max * n;
         
-        while (left <= right) {
-            mid = (left + right) / 2;
+        while(left <= right) {
+            long mid = (right - left)/2 + left;
             long cnt = 0;
             
-            for (int i = 0; i < times.length; i++) {
+            for(int i = 0; i < times.length; i++) {
                 cnt += mid / times[i];
             }
             
-            if (cnt < n) {
-                left = mid + 1;
+            if(cnt < n) {
+                left = mid+1;
             } else {
                 answer = mid;
-                right = mid - 1;
+                right = mid-1;
             }
         }
-        System.out.println(mid);
+        
         return answer;
     }
 }
