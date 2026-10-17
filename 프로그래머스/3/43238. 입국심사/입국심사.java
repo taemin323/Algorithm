@@ -1,38 +1,40 @@
 import java.util.*;
 /**
-* 25분
-* 범위가 엄청 큼. dp는 안될듯.
-* 이분탐색? -> 뭘 기준으로 이분탐색을 할것이냐? 
-* 시간을 기준으로.
+* 심사관 수 : m,  O(m * 탐색 횟수), times.length = m
+* 어떤 시간 T일 때, T/times[i] = i번째 심사관이 T동안 심사한 사람 수
 */
 
 class Solution {
     public long solution(int n, int[] times) {
-        long answer = 0;
-        long max = 0;
-        for(int time : times) {
-            max = Math.max(max, time);
+        return binarySearch(n, times);
+    }
+    
+    public long binarySearch(int n, int[] times) {
+        long left = 0;
+        long right = 0;
+        
+        for(int i = 0; i < times.length; i++) {
+            right = Math.max(right, times[i]);
         }
-        
-        long left = 1;
-        long right = (long) max * n;
-        
-        while(left <= right) {
+    
+        right *= n;
+
+        while(left < right) {
             long mid = (right - left)/2 + left;
-            long cnt = 0;
-            
+            long sum = 0;
+
             for(int i = 0; i < times.length; i++) {
-                cnt += mid / times[i];
+                sum += mid/times[i];
+                if(sum >= n) break;
             }
             
-            if(cnt < n) {
+            if(sum < n) {
                 left = mid+1;
             } else {
-                answer = mid;
-                right = mid-1;
+                right = mid;
             }
         }
         
-        return answer;
+        return left;
     }
 }
